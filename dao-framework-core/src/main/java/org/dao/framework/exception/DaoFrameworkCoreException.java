@@ -5,7 +5,6 @@ package org.dao.framework.exception;
  */
 public class DaoFrameworkCoreException extends Exception{
 
-
     public DaoFrameworkCoreException(String message) {
         super(message);
     }

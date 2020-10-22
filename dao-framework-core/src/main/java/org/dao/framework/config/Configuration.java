@@ -1,6 +1,5 @@
 package org.dao.framework.config;
 
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,14 +19,14 @@ public class Configuration {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private String classPath = "classPath";
+    private static final String CLASSPATH = "classPath";
 
     /**
      * 构造方法，默认添加classPath
      */
     public Configuration() {
         if(applicationConfig.size() == 0) {
-            applicationConfig.put(classPath, Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource("")).getPath());
+            applicationConfig.put(CLASSPATH, Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource("")).getPath());
         }
     }
 
@@ -67,10 +66,10 @@ public class Configuration {
         logger.info("开始接在配置文件");
         // 读取文件流
         // try-with-resources 在try关键字后面的( )里new一些需要自动关闭的资源
-        if(!verifyConfig(classPath)){
-            applicationConfig.put(classPath, Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource("")).getPath());
+        if(!verifyConfig(CLASSPATH)){
+            applicationConfig.put(CLASSPATH, Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource("")).getPath());
         }
-        try (InputStream inputStream = new FileInputStream(getConfig(classPath)+"application.properties")){
+        try (InputStream inputStream = new FileInputStream(getConfig(CLASSPATH)+"application.properties")){
             properties.load(inputStream);
             applicationConfig.putAll(properties);
         } catch (FileNotFoundException e) {
