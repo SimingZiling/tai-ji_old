@@ -6,6 +6,9 @@ import org.yang.localtools.util.ByteUtil;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+/**
+ * MD5
+ */
 public class MD5 {
 
     /**

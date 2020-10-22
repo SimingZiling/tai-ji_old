@@ -18,7 +18,12 @@ public enum RequestMethod {
     private String msg;// 参数
 
 
-    private RequestMethod(String method, String msg) {
+    /**
+     * 构造方法
+     * @param method 请求方式
+     * @param msg 请求参数
+     */
+    RequestMethod(String method, String msg) {
         this.method = method;
         this.msg = msg;
     }

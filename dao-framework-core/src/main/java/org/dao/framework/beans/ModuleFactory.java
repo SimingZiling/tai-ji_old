@@ -26,7 +26,7 @@ public class ModuleFactory {
     /**
      * 初始化模块
      */
-    public void doInftModules(){
+    public void doInitModules(){
 
         // 加载配置文件
         new Configuration().doLoadApplicationConfig();

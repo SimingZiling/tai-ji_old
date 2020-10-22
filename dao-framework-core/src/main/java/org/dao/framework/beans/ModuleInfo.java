@@ -15,10 +15,6 @@ public class ModuleInfo {
      */
     private Object object;
 
-    /*
-    组件的set/get方法
-     */
-
     /**
      * 获取组件类
      * @return 组件类

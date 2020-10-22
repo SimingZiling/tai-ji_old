@@ -35,7 +35,6 @@ public class IdCard {
      */
     private static final  String BIRTH_DATE_FORMAT = "yyyyMMdd";
 
-
     /**
      * 验证中国身份证号
      * @param idCardNumber 身份证号
