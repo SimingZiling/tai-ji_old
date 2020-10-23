@@ -7,8 +7,8 @@
   <display-name/>
 
   <servlet>
-    <servlet-name>nwmvc</servlet-name>
-    <servlet-class>org.shanhaijing.framework.servlet.DispatcherServlet</servlet-class>
+    <servlet-name>dfmvc</servlet-name>
+    <servlet-class>org.daoframework.web.servlet.DispatcherServlet</servlet-class>
     <init-param>
       <param-name>contextConfigLocation</param-name>
       <param-value>application.properties</param-value>
@@ -16,12 +16,12 @@
     <load-on-startup>1</load-on-startup>
   </servlet>
   <servlet-mapping>
-    <servlet-name>nwmvc</servlet-name>
+    <servlet-name>dfmvc</servlet-name>
     <url-pattern>/*</url-pattern>
   </servlet-mapping>
 
   <!--  配置初始化监听器-->
   <listener>
-    <listener-class>org.shanhaijing.framework.servlet.InitListener</listener-class>
+    <listener-class>org.daoframework.web.servlet.InitListener</listener-class>
   </listener>
 </web-app>

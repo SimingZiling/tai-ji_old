@@ -1,4 +1,4 @@
-package org.dao.framework.beans.annotation;
+package org.dao.framework.request.annotation;
 
 import java.lang.annotation.*;
 
@@ -7,6 +7,6 @@ import java.lang.annotation.*;
 @Documented
 public @interface RequestParam {
 
-    String value() default "";
+    String value() ;
 
 }

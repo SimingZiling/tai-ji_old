@@ -1,5 +1,6 @@
 package org.dao.framework.request;
 
+
 import org.dao.framework.request.annotation.RequestMapping;
 
 import java.lang.reflect.Method;
@@ -12,9 +13,10 @@ import java.util.Map;
 public class HandlerMapping {
 
 
-    private static Map<String, Handler> handlerMap = new HashMap<>();
+    public static Map<String, Handler> handlerMap = new HashMap<>();
 
     public static Handler getHandler(String url) {
+        System.out.println(handlerMap.keySet());
         return handlerMap.get(url);
     }
 
@@ -54,6 +56,8 @@ public class HandlerMapping {
                     // 封装请求头
                     handler.setRequestMethods(methodRequestMapping.method());
                     String url = (classRequestMappingNmae+methodRequestMappingNmae).replaceAll("/+","/");
+                    // 去掉url中的空格
+                    url = url.replaceAll("\\s+","");
                     handlerMap.put(url,handler);
                 }
             }

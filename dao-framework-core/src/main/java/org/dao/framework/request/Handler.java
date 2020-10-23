@@ -1,10 +1,7 @@
 package org.dao.framework.request;
 
-
-
-
-import org.dao.framework.beans.annotation.RequestParam;
 import org.dao.framework.request.annotation.RequestMethod;
+import org.dao.framework.request.annotation.RequestParam;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;

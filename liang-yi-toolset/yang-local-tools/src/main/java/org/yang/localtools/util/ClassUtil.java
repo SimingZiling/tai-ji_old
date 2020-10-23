@@ -246,7 +246,6 @@ public class ClassUtil {
         if(annotations.length <= 0){
             return false;
         }
-
         // 开始遍历注解
         for (Annotation annotation : annotations){
             if (annotation.annotationType() != Deprecated.class &&

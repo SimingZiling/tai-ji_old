@@ -1,5 +1,6 @@
 package org.dao.framework.request;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -54,5 +55,4 @@ public class Request {
     public String getRequestHeader(String headerName){
         return this.requestHeaderMap.get(headerName);
     }
-
 }
