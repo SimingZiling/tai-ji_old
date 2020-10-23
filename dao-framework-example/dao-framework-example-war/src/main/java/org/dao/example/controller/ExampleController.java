@@ -15,7 +15,7 @@ public class ExampleController {
     @Inject
     private ExampleService exampleService;
 
-    @RequestMapping(method = RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.GET,value = "example ")
     public String example(@RequestParam("name ") String name){
 
         return exampleService.example(name);

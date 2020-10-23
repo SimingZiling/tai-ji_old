@@ -27,8 +27,8 @@ public class DispatcherServlet extends HttpServlet {
         String url = req.getRequestURI().replaceAll(contextPath,"").replaceAll("/+","/");
         // 封装请求
         Request request = encapsulatedRequest(req);
-
         // 通过HandlerMapping获取到对应的Handler
+        url = url.replaceAll("\\s+","");
         Handler handler =  HandlerMapping.getHandler(url);
         // 当handler不存时返回404
         if(Configuration.verifyConfig("characterEncoding")){

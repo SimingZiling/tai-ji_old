@@ -16,7 +16,6 @@ public class HandlerMapping {
     public static Map<String, Handler> handlerMap = new HashMap<>();
 
     public static Handler getHandler(String url) {
-        System.out.println(handlerMap.keySet());
         return handlerMap.get(url);
     }
 
