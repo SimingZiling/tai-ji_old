@@ -13,6 +13,7 @@
         <module>liang-yi</module>
         <module>dao-framework-example</module>
         <module>dao-framework-web</module>
+        <module>si-xiang</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

@@ -9,11 +9,10 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>dao-framework-example</artifactId>
+    <artifactId>si-xiang</artifactId>
     <packaging>pom</packaging>
     <modules>
-        <module>dao-framework-example-war</module>
-        <module>dao-framework-example-jar</module>
+        <module>shao-yin-database</module>
     </modules>
 
 

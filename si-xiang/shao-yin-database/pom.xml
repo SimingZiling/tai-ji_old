@@ -3,17 +3,16 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>dao</artifactId>
+        <artifactId>si-xiang</artifactId>
         <groupId>org.dao</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>dao-framework-example</artifactId>
+    <artifactId>shao-yin-database</artifactId>
     <packaging>pom</packaging>
     <modules>
-        <module>dao-framework-example-war</module>
-        <module>dao-framework-example-jar</module>
+        <module>shao-yin-database-core</module>
     </modules>
 
 
