@@ -13,6 +13,8 @@ import java.util.Set;
  */
 public class ConnectionPool {
 
+    private ConnectionPool(){}
+
     /**
      * 连接池列表
      */
@@ -59,8 +61,9 @@ public class ConnectionPool {
      * @return 连接
      */
     public static Connection getConnection(){
+        // TODO 可能存在连接池中连接超时问题
         // 如果连接池中有连接则使用连接池中的连接，如果没有则创建一个连接
-        if (connectionSet.size() != 0){
+        if (!connectionSet.isEmpty()){
             Connection connection = connectionSet.iterator().next();
             connectionSet.remove(connection);
             return connection;
