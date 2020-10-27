@@ -5,7 +5,6 @@ import org.shaoyin.database.jdbc.pool.ConnectionPool;
 import org.shaoyin.database.session.Session;
 import org.shaoyin.database.session.SessionFactory;
 
-import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -14,11 +13,11 @@ import java.util.Set;
  */
 public class SessionFactoryImpl implements SessionFactory {
 
-    private Set<SessionImpl> sessions = new HashSet<>();
+    private final Set<MySqlSessionImpl> sessions = new HashSet<>();
 
     @Override
     public Session openSession() {
-        SessionImpl session = new SessionImpl();
+        MySqlSessionImpl session = new MySqlSessionImpl();
         // 从连接池获取一个数据库连接 并且提供Session使用
         session.connection = ConnectionPool.getConnection();
         sessions.add(session);

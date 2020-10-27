@@ -50,6 +50,7 @@ public class ModuleFactory {
      * 开始进行依赖注入
      */
     private void doAutowirted() {
+        // TODO 验证注入的组件是否存在
         logger.info("开始进行依赖注入");
         Modules.moduleInfoMap.forEach((key, value) -> {
             // 获取到所有的属性
@@ -98,7 +99,7 @@ public class ModuleFactory {
                 String modulenName = getModuleName(clazz,object);
                 // 判断beanNmae中是否重复
                 if(Modules.moduleInfoMap.containsKey(modulenName)){
-                    throw new DaoFrameworkCoreException("Bean:"+modulenName+" 名称重复！");
+                    throw new DaoFrameworkCoreException("组件:"+modulenName+" 名称重复！");
                 }
                 moduleDefinition.setObject(object);
                 Modules.moduleInfoMap.put(modulenName,moduleDefinition);

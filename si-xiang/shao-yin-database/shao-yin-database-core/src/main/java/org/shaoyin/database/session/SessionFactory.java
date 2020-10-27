@@ -20,6 +20,6 @@ public interface SessionFactory {
     /**
      * 关闭session工厂
      */
-    void close() throws SQLException, DatabaseCoreException;
+    void close() throws DatabaseCoreException;
 
 }

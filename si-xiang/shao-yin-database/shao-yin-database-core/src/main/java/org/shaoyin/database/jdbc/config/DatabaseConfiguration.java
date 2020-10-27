@@ -1,4 +1,4 @@
-package org.shaoyin.database.jdbc.config;
+package org.shaoyin.database.config;
 
 
 /**
