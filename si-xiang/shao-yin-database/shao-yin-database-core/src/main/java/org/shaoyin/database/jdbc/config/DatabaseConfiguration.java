@@ -1,4 +1,4 @@
-package org.shaoyin.database.config;
+package org.shaoyin.database.jdbc.config;
 
 
 /**
@@ -6,10 +6,12 @@ package org.shaoyin.database.config;
  */
 public class DatabaseConfiguration {
 
+    private DatabaseConfiguration(){}
+
     /**
      * 驱动类
      */
-    private static String DriverClass;
+    private static String driverClass;
     /**
      * 连接地址
      */
@@ -23,13 +25,12 @@ public class DatabaseConfiguration {
      */
     private static String password;
 
-
     public static String getDriverClass() {
-        return DriverClass;
+        return driverClass;
     }
 
     public static void setDriverClass(String driverClass) {
-        DriverClass = driverClass;
+        DatabaseConfiguration.driverClass = driverClass;
     }
 
     public static String getUrl() {

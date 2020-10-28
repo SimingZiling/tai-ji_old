@@ -1,10 +1,10 @@
 package org.shaoyin.database.session.impl;
 
-import org.shaoyin.database.exception.DatabaseCoreException;
 import org.shaoyin.database.jdbc.pool.ConnectionPool;
 import org.shaoyin.database.session.Session;
 import org.shaoyin.database.session.SessionFactory;
 
+import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -25,7 +25,7 @@ public class SessionFactoryImpl implements SessionFactory {
     }
 
     @Override
-    public void close() throws DatabaseCoreException {
+    public void close() throws SQLException {
         // 判断Session列表是否为空
         if(!sessions.isEmpty()){
             // 遍历Session

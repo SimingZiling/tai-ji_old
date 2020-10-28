@@ -38,9 +38,7 @@ public class ObjectRelationMapping {
 
     /**
      * 处理结果集，得到map对应的记录
-     *
-     * @param resultSet
-     *            结果集
+     * @param resultSet 结果集
      * @return 集合
      */
     public static Map<String, Object> handleResultSetToMap(ResultSet resultSet) {

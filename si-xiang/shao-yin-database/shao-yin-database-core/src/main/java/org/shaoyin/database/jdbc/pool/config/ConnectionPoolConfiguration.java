@@ -6,6 +6,8 @@ package org.shaoyin.database.jdbc.pool.config;
  */
 public class ConnectionPoolConfiguration {
 
+    private ConnectionPoolConfiguration(){}
+
     /**
      * 连接最大数 默认值为：10
      */

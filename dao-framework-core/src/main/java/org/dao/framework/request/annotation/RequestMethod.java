@@ -15,7 +15,7 @@ public enum RequestMethod {
     TRACE("TRACE", "回显服务器收到的请求，主要用于测试或诊断");
 
     private final String method;// 请求方式
-    private String msg;// 参数
+    private String msg;// 信息
 
 
     /**

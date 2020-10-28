@@ -1,6 +1,5 @@
 package org.shaoyin.database.session;
 
-import org.shaoyin.database.exception.DatabaseCoreException;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -15,7 +14,22 @@ public interface Session {
      /**
       * 关闭Session
       */
-     void close() throws DatabaseCoreException;
+     void close() throws  SQLException;
+
+     /**
+      * 开启事务
+      */
+     void beginTransaction() throws  SQLException;
+
+     /**
+      * 提交事务
+      */
+     void commitTransaction() throws SQLException;
+
+     /**
+      * 事务回滚
+      */
+     void rollBackTransaction() throws SQLException;
 
      /*添加*/
 
@@ -25,7 +39,7 @@ public interface Session {
       * @param paramList 参数列表
       * @return 主键id 或者添加结果
       */
-     int insert(String sql,List<Object> paramList,boolean GeneratedKeys) throws SQLException, DatabaseCoreException;
+     int insert(String sql,List<Object> paramList,boolean generatedKeys) throws SQLException;
 
      /**
       * 插入数据
@@ -57,9 +71,6 @@ public interface Session {
       */
      <T> List<T> insert(Class<T> clazz,List<Map<String,Object>> paramList);
 
-
-
-
      /*删除*/
 
      /**
@@ -68,7 +79,7 @@ public interface Session {
       * @param paramList 删除对象
       * @return 删除结果
       */
-     int delete(String sql,List<Object> paramList) throws DatabaseCoreException;
+     int delete(String sql,List<Object> paramList) throws SQLException;
 
      /**
       * 删除数据
@@ -83,7 +94,6 @@ public interface Session {
       * @return 删除结果
       */
      <T> int delete(List<T> tList);
-
 
      /**
       * 删除数据
@@ -108,7 +118,7 @@ public interface Session {
       * @param paramList 参数列表
       * @return 更新结果
       */
-     int update(String sql,List<Object> paramList) throws DatabaseCoreException;
+     int update(String sql,List<Object> paramList) throws SQLException;
 
      /**
       * 更新数据
@@ -147,8 +157,7 @@ public interface Session {
       * @param paramList 参数列表
       * @return 数据Map
       */
-     Map<String,Object> select(String sql,List<Object> paramList) throws DatabaseCoreException;
-
+     Map<String,Object> select(String sql,List<Object> paramList) throws SQLException;
 
      /**
       * 查询数据列表
@@ -156,7 +165,7 @@ public interface Session {
       * @param paramList 参数列表
       * @return 数据Map
       */
-     List<Map<String,Object>> selectList(String sql,List<Object> paramList) throws DatabaseCoreException;
+     List<Map<String,Object>> selectList(String sql,List<Object> paramList) throws SQLException;
 
      /**
       * 查询数据

@@ -1,7 +1,6 @@
 package org.shaoyin.database.jdbc.util;
 
 import org.shaoyin.database.jdbc.config.DatabaseConfiguration;
-import org.shaoyin.database.jdbc.pool.ConnectionPool;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -11,6 +10,8 @@ import java.sql.SQLException;
  * JDBC扩展功能
  */
 public class JDBCUtil {
+
+    private JDBCUtil(){}
 
     static {
         try {
