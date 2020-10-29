@@ -31,7 +31,7 @@ public class TypeConversion {
         }
         // 判断时间类型
         if (clazz.equals(Date.class)){
-            return JDBCType.DATE.getName();
+            return "DATETIME";
         }
         // 判断单精度浮点类型
         if ( clazz.equals(Float.class) || clazz.equals(float.class)){

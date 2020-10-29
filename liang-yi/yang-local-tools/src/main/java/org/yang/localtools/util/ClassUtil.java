@@ -1,10 +1,13 @@
 package org.yang.localtools.util;
 
+import org.yang.localtools.exception.LocalToolsException;
+
 import javax.annotation.processing.Generated;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.annotation.*;
+import java.lang.reflect.Method;
 import java.net.JarURLConnection;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -266,5 +269,23 @@ public class ClassUtil {
             }
         }
         return false;
+    }
+
+    /**
+     * 通过属性名称获取Get或者is方法
+     * @param clazz 类
+     * @param fieldName 属性名称
+     * @return 方法对象
+     */
+    public static Method getGetOrIsMethod(Class<?> clazz, String fieldName) throws LocalToolsException {
+        try {
+            return clazz.getMethod("get"+StringUtil.initialCapital(fieldName));
+        } catch (NoSuchMethodException ignored) {
+        }
+        try {
+            return clazz.getMethod("is"+StringUtil.initialCapital(fieldName));
+        } catch (NoSuchMethodException ignored) {
+        }
+        throw new LocalToolsException(clazz.getName()+"中没有"+fieldName+"的get或者is方法！");
     }
 }

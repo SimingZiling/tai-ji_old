@@ -11,26 +11,43 @@ import java.util.Date;
 @Table("user_s")
 public class User {
 
-    @Column(notNull = true)
-    public int id;
+    @Column(value = "id_s",key = true)
+    private int id;
 
-    @Column
     private String name;
 
-    @Column
-    private Integer a;
+    private String email;
 
-    @Column
-    private int b;
+    public Date birthday;
 
-    @Column
-    private boolean c;
+    @Column(length = 10,decimals = 2)
+    private Float ints;
 
-    @Column
-    private Boolean d;
+    private String sha;
 
-    private Date e;
+    public int getId() {
+        return id;
+    }
 
+    public void setId(int id) {
+        this.id = id;
+    }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Column(value = "email_s")
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
 }

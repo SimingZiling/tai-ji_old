@@ -37,4 +37,24 @@ public @interface Column {
      */
     String jdbcType() default "";
 
+    int decimals() default 0;
+
+    /**
+     * 自动增长
+     * @return 默认为否
+     */
+    boolean autoIncrement() default false;
+
+    /**
+     * 备注
+     * @return 备注信息
+     */
+    String comment() default "";
+
+    /**
+     * 主键
+     * @return 是否为主键
+     */
+    boolean key() default false;
+
 }
