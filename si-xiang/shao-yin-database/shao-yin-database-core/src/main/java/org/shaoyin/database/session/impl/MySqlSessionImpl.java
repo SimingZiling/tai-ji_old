@@ -89,7 +89,6 @@ public class MySqlSessionImpl implements Session {
         }
     }
 
-
     @Override
     public int insert(String sql, List<Object> paramList) throws SQLException, DatabaseCoreException {
         return Integer.parseInt(String.valueOf(insert(sql,paramList,false)));
@@ -149,6 +148,11 @@ public class MySqlSessionImpl implements Session {
     @Override
     public int update(String sql, List<Object> paramList) throws SQLException {
         return execSQL(sql,paramList);
+    }
+
+    @Override
+    public int update(String sql) throws SQLException {
+        return execSQL(sql);
     }
 
 

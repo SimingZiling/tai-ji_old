@@ -137,6 +137,8 @@ public interface Session {
       * @return 执行结果
       */
      int update(String sql,List<Object> paramList) throws SQLException;
+
+     int update(String sql) throws SQLException;
 //
 //     /**
 //      * 删除数据
