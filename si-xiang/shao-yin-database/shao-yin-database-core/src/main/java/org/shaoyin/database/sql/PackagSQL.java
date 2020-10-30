@@ -2,17 +2,22 @@ package org.shaoyin.database.sql;
 
 import org.shaoyin.database.annotation.Column;
 import org.shaoyin.database.annotation.Table;
+import org.shaoyin.database.exception.DatabaseCoreException;
 import org.shaoyin.database.exception.DoNotCreateException;
 import org.shaoyin.database.jdbc.conversion.TypeConversion;
+import org.shaoyin.database.util.ColumnInfo;
 import org.yang.localtools.exception.LocalToolsException;
 import org.yang.localtools.util.ClassUtil;
+import org.yang.localtools.util.StringUtil;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.sql.JDBCType;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 
@@ -22,20 +27,7 @@ import java.util.List;
 public class PackagSQL {
 
     private PackagSQL(){}
-
-    /**
-     * 获取字段名
-     * @param column 属性注解
-     * @param fieldName 字段名
-     * @return 字段名
-     */
-    private static String getFieldName(Column column,String fieldName){
-        if(column == null || column.value().equals("")){
-            return "`"+fieldName+"`";
-        }else {
-            return "`"+column.value()+"`";
-        }
-    }
+    
 
     /**
      * 获取备注
@@ -111,7 +103,7 @@ public class PackagSQL {
         StringBuilder stringBuilder = new StringBuilder();
 
         // 设置字段名称 前后设置` 避免关键字
-        stringBuilder.append(getFieldName(column, fieldName)).append(" ");
+        stringBuilder.append("`").append(ColumnInfo.getFieldName(column, fieldName)).append("` ");
         // 设置类型
         String type = getType(column,fieldType);
         stringBuilder.append(type);
@@ -172,12 +164,11 @@ public class PackagSQL {
         // 当table注解的value属性为空时表名为首字母小写的类名
         if(table.value().equals("")){
             // 获取类名并去掉包名将首字母小写
-            return entity.getName().substring(entity.getName().lastIndexOf(".") + 1).substring(0, 1).toLowerCase()+entity.getName().substring(entity.getName().lastIndexOf(".") + 1).substring(1);
+            return StringUtil.initialLowercase(entity.getName().substring(entity.getName().lastIndexOf(".") + 1));
         }else {
             return table.value();
         }
     }
-
 
     /**
      * 创建表
@@ -255,5 +246,156 @@ public class PackagSQL {
         }else {
             throw new DoNotCreateException(entity.getName()+" 该实体没有Table注解，不删除表！");
         }
+    }
+
+    /**
+     * 插入
+     * @param t 对象
+     * @return 插入sql语句
+     */
+    public static <T> String insert(T t){
+        return insert(t,true);
+    }
+
+    private static String getFieldNameByField(Field field,Class<?> entity){
+        StringBuilder stringBuilder = new StringBuilder();
+        Column column = null;
+        if(field.isAnnotationPresent(Column.class)){
+            column = field.getAnnotation(Column.class);
+            stringBuilder.append("`").append(ColumnInfo.getFieldName(column, field.getName())).append("`");
+        }else {
+            try {
+                Method method = ClassUtil.getGetOrIsMethod(entity,field.getName());
+                if(method.isAnnotationPresent(Column.class)){
+                    column = method.getAnnotation(Column.class);
+                }
+                stringBuilder.append("`").append(ColumnInfo.getFieldName(column, field.getName())).append("`");
+            } catch (LocalToolsException e) {
+                if(Modifier.isPublic(field.getModifiers()) || Modifier.isProtected(field.getModifiers())){
+                    stringBuilder.append("`").append(ColumnInfo.getFieldName(column, field.getName())).append("`");
+                }
+            }
+        }
+        return stringBuilder.toString();
+    }
+
+    /**
+     * 插入
+     * @param t 对象
+     * @param joint 是否拼接参数
+     * @return 插入sql语句
+     */
+    public static <T> String insert(T t,boolean joint){
+        // 开始构建语句
+        StringBuilder stringBuilder = new StringBuilder("INSERT INTO ");
+        stringBuilder.append(getTableName(t.getClass())).append("(");
+        Field[] fields = t.getClass().getDeclaredFields();
+        // 遍历属性
+        StringBuilder tailStringBuilder = new StringBuilder("VALUES (");
+//        Arrays.stream(fields).forEach(field ->{
+        int i = 0;
+        for (Field field : fields) {
+            field.setAccessible(true);
+            try {
+                if (field.get(t) == null) {
+                    i += 1;
+                    continue;
+                }
+                Column column = null;
+                if (field.isAnnotationPresent(Column.class)) {
+                    column = field.getAnnotation(Column.class);
+                    stringBuilder.append("`").append(ColumnInfo.getFieldName(column, field.getName())).append("`,");
+                } else {
+                    try {
+                        Method method = ClassUtil.getGetOrIsMethod(t.getClass(), field.getName());
+                        if (method.isAnnotationPresent(Column.class)) {
+                            column = method.getAnnotation(Column.class);
+                        }
+                        stringBuilder.append("`").append(ColumnInfo.getFieldName(column, field.getName())).append("`,");
+                    } catch (LocalToolsException e) {
+                        if (Modifier.isPublic(field.getModifiers()) || Modifier.isProtected(field.getModifiers())) {
+                            stringBuilder.append("`").append(ColumnInfo.getFieldName(column, field.getName())).append("`,");
+                        }
+                    }
+                }
+                if (joint) {
+                    if (getType(column, field.getType()).equals("DATETIME")) {
+                        tailStringBuilder.append("'").append(new Timestamp(((Date) field.get(t)).getTime())).append("',");
+                    } else {
+                        tailStringBuilder.append("'").append(field.get(t)).append("',");
+                    }
+                } else {
+                    tailStringBuilder.append("?,");
+                }
+            } catch (IllegalAccessException ignored) {
+            }
+        }
+//        });
+        if(i==fields.length){
+            try {
+                throw new DatabaseCoreException("插入语句构建失败！==》"+t.getClass().getName()+"对象所有属性为空！");
+            } catch (DatabaseCoreException e) {
+                e.printStackTrace();
+            }
+        }
+        stringBuilder.deleteCharAt(stringBuilder.length()-1).append(") ");
+        stringBuilder.append(tailStringBuilder);
+        stringBuilder.deleteCharAt(stringBuilder.length()-1).append(");");
+        return stringBuilder.toString();
+    }
+
+    /**
+     * 删除SQL
+     * @param t 实体
+     * @return 删除sql
+     */
+    public static <T> String delete(T t){
+        StringBuilder stringBuilder = new StringBuilder("DELETE FROM ");
+        stringBuilder.append(getTableName(t.getClass()));
+        stringBuilder.append(" WHERE ");
+//        Arrays.stream(t.getClass().getDeclaredFields()).forEach(field -> {
+        Field[] fields = t.getClass().getDeclaredFields();
+        int i = 0;
+        for (Field field : fields){
+            field.setAccessible(true);
+            try {
+                if(field.get(t) == null){
+                    i += 1;
+                    continue;
+                }
+                Column column = null;
+                if(field.isAnnotationPresent(Column.class)){
+                    column = field.getAnnotation(Column.class);
+                    stringBuilder.append("`").append(ColumnInfo.getFieldName(column, field.getName())).append("`");
+                }else {
+                    stringBuilder.append(getFieldNameByField(field,t.getClass()));
+                }
+                if(getType(column,field.getType()).equals("DATETIME")){
+                    stringBuilder.append(" = '").append(new Timestamp(((Date) field.get(t)).getTime())).append("' AND ");
+                }else {
+                    stringBuilder.append(" = '").append(field.get(t)).append("' AND ");
+                }
+
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+//        });
+        }
+        if(i==fields.length){
+            try {
+                throw new DatabaseCoreException("删除语句构建失败！==》"+t.getClass().getName()+"对象所有属性为空！");
+            } catch (DatabaseCoreException e) {
+                e.printStackTrace();
+            }
+        }
+        stringBuilder.delete(stringBuilder.length()-4,stringBuilder.length()).append(";");
+        return stringBuilder.toString();
+    }
+
+    public static String select(Class<?> entity){
+        StringBuilder stringBuilder = new StringBuilder("SELECT ");
+        Arrays.stream(entity.getDeclaredFields()).forEach(field -> stringBuilder.append("`").append(getFieldNameByField(field,entity)).append("`,"));
+        stringBuilder.deleteCharAt(stringBuilder.length()-1).append(" WHERE ");
+        return stringBuilder.toString();
     }
 }

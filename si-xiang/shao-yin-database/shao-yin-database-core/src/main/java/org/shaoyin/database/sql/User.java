@@ -12,7 +12,7 @@ import java.util.Date;
 public class User {
 
     @Column(value = "id_s",key = true)
-    private int id;
+    private Integer id;
 
     private String name;
 
@@ -50,4 +50,15 @@ public class User {
         this.email = email;
     }
 
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", birthday=" + birthday +
+                ", ints=" + ints +
+                ", sha='" + sha + '\'' +
+                '}';
+    }
 }
