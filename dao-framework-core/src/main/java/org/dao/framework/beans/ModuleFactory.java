@@ -163,7 +163,7 @@ public class ModuleFactory {
         Set<Class<?>> clazzs = ClassUtil.scanClases(packages);
         clazzs.forEach(clazz ->{
             // 判断当clazz 不是注解的时候记录到bean中，并且迭代判断是否具有Bean注解
-            if(!clazz.isAnnotation() && ClassUtil.verifyAnnotation(clazz, Module.class,true)) {
+            if(!clazz.isAnnotation() && ClassUtil.verifyClassAnnotation(clazz, Module.class,true)) {
                 // 封装BeanDefinition
                 ModuleInfo moduleInfo = new ModuleInfo();
                 moduleInfo.setClazz(clazz);

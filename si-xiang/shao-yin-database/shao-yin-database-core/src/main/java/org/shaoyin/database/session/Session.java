@@ -39,7 +39,7 @@ public interface Session {
       * @param sql sql
       * @return 执行结果
       */
-     int execSQL(String sql) throws SQLException;
+     int execUpdateSQL(String sql) throws SQLException;
 
      /**
       * 执行sql，并且携带参数
@@ -48,7 +48,7 @@ public interface Session {
       * @param paramList 参数列表
       * @return 执行结果
       */
-     int execSQL(String sql,List<Object> paramList) throws SQLException;
+     int execUpdateSQL(String sql,List<Object> paramList) throws SQLException;
 
 
      /**
@@ -130,6 +130,8 @@ public interface Session {
       */
      <T> int delete(T t) throws SQLException;
 
+     <T> void delete(List<T> tList) throws SQLException;
+
      /**
       * 更新数据
       * @param sql sql语句
@@ -138,109 +140,43 @@ public interface Session {
       */
      int update(String sql,List<Object> paramList) throws SQLException;
 
+     /**
+      * 更新数据
+      * @param sql sql语句
+      * @return 执行结果
+      */
      int update(String sql) throws SQLException;
-//
-//     /**
-//      * 删除数据
-//      * @param t 对象
-//      * @return 删除结果
-//      */
-//     <T> int delete(T t);
-//
-//     /**
-//      * 删批量删除数据
-//      * @param tList 数据列表
-//      * @return 删除结果
-//      */
-//     <T> int delete(List<T> tList);
-//
-//     /**
-//      * 删除数据
-//      * @param clazz 类
-//      * @param paramMap 参数Map
-//      * @return 删除结果
-//      */
-//     <T> int delete(Class<T> clazz,Map<String,Object> paramMap);
-//
-//     /**
-//      * 批量删除数据
-//      * @param paramMapList 参数Map列表
-//      * @return 删除结果
-//      */
-//     <T> int delete(Class<T> clazz,List<Map<String,Object>> paramMapList);
-//
-//     /*更新*/
-//
-//     /**
-//      * 更新数据
-//      * @param sql sql语句
-//      * @param paramList 参数列表
-//      * @return 更新结果
-//      */
-//     int update(String sql,List<Object> paramList) throws SQLException;
-//
-//     /**
-//      * 更新数据
-//      * @param t 对象
-//      * @return 更新参数
-//      */
-//     <T> int update(T t);
-//
-//     /**
-//      * 更新数据列表
-//      * @param tList 对象列表
-//      * @return 更新结果
-//      */
-//     <T> int update(List<T> tList);
-//
-//     /**
-//      * 更新数据
-//      * @param clazz 类
-//      * @param paramMap 参数Map
-//      * @return 更新结果
-//      */
-//     <T> int update(Class<T> clazz,Map<String,Object> paramMap);
-//
-//     /**
-//      * 批量更新数据
-//      * @param paramMapList 参数Map列表
-//      * @return 更新结果
-//      */
-//     <T> int update(Class<T> clazz,List<Map<String,Object>> paramMapList);
-//
-//     /*查询*/
-//
-//     /**
-//      * 查询数据
-//      * @param sql sql语句
-//      * @param paramList 参数列表
-//      * @return 数据Map
-//      */
-//     Map<String,Object> select(String sql,List<Object> paramList) throws SQLException;
-//
-//     /**
-//      * 查询数据列表
-//      * @param sql sql语句
-//      * @param paramList 参数列表
-//      * @return 数据Map
-//      */
-//     List<Map<String,Object>> selectList(String sql,List<Object> paramList) throws SQLException;
-//
-//     /**
-//      * 查询数据
-//      * @param sql sql语句
-//      * @param paramList 参数列表
-//      * @param clazz 类
-//      * @return 对象
-//      */
-//     <T> T select(String sql,List<Object> paramList,Class<T> clazz);
-//
-//     /**
-//      * 查询数据列表
-//      * @param sql sql语句
-//      * @param paramList 参数列表
-//      * @param clazz 类
-//      * @return 对象列表
-//      */
-//     <T> List<T> selectList(String sql,List<Object> paramList,Class<T> clazz);
+
+     /**
+      * 查询数据
+      * @param sql sql语句
+      * @param paramList 参数
+      * @return 查询结果Map
+      */
+     Map<String,Object> select(String sql,List<Object> paramList) throws SQLException;
+
+     /**
+      * 查询数据
+      * @param sql sql语句
+      * @return 查询结果Map
+      */
+     Map<String,Object> select(String sql) throws SQLException;
+
+     /**
+      * 查询数据列表
+      * @param sql sql语句
+      * @param paramList 参数
+      * @return 查询结果Map列表
+      */
+     List<Map<String,Object>> selectList(String sql,List<Object> paramList) throws SQLException;
+
+     /**
+      * 查询数据列表
+      * @param sql sql语句
+      * @return 查询结果Map列表
+      */
+     List<Map<String,Object>> selectList(String sql) throws SQLException;
+
+     <T> T select(String sql,List<Object> paramList,Class<T> clazz) throws SQLException;
+
 }

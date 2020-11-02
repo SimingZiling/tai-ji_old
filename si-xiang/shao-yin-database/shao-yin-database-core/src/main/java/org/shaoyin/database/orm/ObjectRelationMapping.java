@@ -45,7 +45,10 @@ public class ObjectRelationMapping {
         Map<String, Object> map = new HashMap<>();
         try {
             List<String> columnLabels = getColumnLabels(resultSet);
-            resultSet.next();
+//            if(!resultSet.next()){
+//                return null;
+//            }
+//            System.out.println(resultSet.next());
             for (String columnLabel : columnLabels) {
                 Object value = resultSet.getObject(columnLabel);
                 map.put(columnLabel, value);

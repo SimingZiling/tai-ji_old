@@ -3,14 +3,15 @@ package org.yang.localtools.util;
 
 
 
+import org.yang.localtools.exception.LocalToolsException;
 import org.yang.localtools.util.annotation.Alias;
 
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.*;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -49,71 +50,42 @@ public class MapUtil {
      * @param <T> 对象
      * @return 对象
      */
-    public static <T> T mapToObject(Class<T> clazz,Map<String, Object> values) throws IntrospectionException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, NoSuchFieldException {
-        // TODO 验证参数是否为基础类型，不为基础类型则再次进行转换
+    public static <T> T mapToObject(Class<T> clazz,Map<String, Object> values) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, IntrospectionException {
         // 实例化对象
-        T t =  clazz.getDeclaredConstructor().newInstance();
-        // 获取属性
-        for (PropertyDescriptor propertyDescriptor : Introspector.getBeanInfo(clazz).getPropertyDescriptors()){
-            if(propertyDescriptor.getName().equals("class")){
-                continue;
+        T t = clazz.getDeclaredConstructor().newInstance();
+        // 获取属性列表(获取属性包含私有属性)
+        Field[] fields = clazz.getDeclaredFields();
+        // 遍历属性
+        for(Field field : fields) {
+            // 获取别名属性
+            Object fieldName = ClassUtil.getAnnotationValue(field.getAnnotations(), Alias.class, "value");
+            // 如果fieldName为空则从方法中获取值
+            if (fieldName == null || fieldName.equals("")) {
+                try {
+                    // 获取get或者is方法
+                    Method method = ClassUtil.getGetOrIsMethod(clazz, field.getName());
+                    // 获取方法注解
+                    fieldName = ClassUtil.getAnnotationValue(method.getDeclaredAnnotations(), Alias.class, "value");
+                } catch (LocalToolsException ignored) {}
             }
-            // 获取属性
-            String propertyName = propertyDescriptor.getName().substring(0, 1).toUpperCase() + propertyDescriptor.getName().substring(1);
-            Method method = propertyDescriptor.getReadMethod();
-            // 获取方法注解
-            if (method.isAnnotationPresent(Alias.class)) {
-                Alias alias = method.getAnnotation(Alias.class);
-                // 判断是否有别名
-                if (alias.value().equals("")) {
-                    //获取map的值
-                    Object value = values.get(propertyDescriptor.getName());
-                    Object[] args = new Object[1];
-                    args[0] = value;
-                    // 属性赋值
-                    propertyDescriptor.getWriteMethod().invoke(t, args);
+            if (field.getType().getClassLoader() == null) {
+                // 判断fieldName是否为空 如果是则直接给属性名称，如果不是空则给别名
+                if (fieldName == null || fieldName.equals("")) {
+                    ClassUtil.setFieldValues(t, field, values.get(field.getName()));
                 } else {
-                    //获取map的值
-                    Object value = values.get(alias.value());
-                    Object[] args = new Object[1];
-                    args[0] = value;
-                    propertyDescriptor.getWriteMethod().invoke(t, args);
+                    ClassUtil.setFieldValues(t, field, values.get(String.valueOf(fieldName)));
                 }
-            }else
-                // 获取属性注解
-                if(clazz.getDeclaredField(propertyDescriptor.getName()).isAnnotationPresent(Alias.class)){
-                    Alias alias = clazz.getDeclaredField(propertyDescriptor.getName()).getAnnotation(Alias.class);
-                    // 判断是否有别名
-                    if (alias.value().equals("")) {
-                        //获取map的值
-                        Object value = values.get(propertyDescriptor.getName());
-                        Object[] args = new Object[1];
-                        args[0] = value;
-                        // 属性赋值
-                        propertyDescriptor.getWriteMethod().invoke(t, args);
-                    } else {
-                        //获取map的值
-                        Object value = values.get(alias.value());
-                        Object[] args = new Object[1];
-                        args[0] = value;
-                        propertyDescriptor.getWriteMethod().invoke(t, args);
-                    }
-            }else
-                //判断map的值与属性名称是否一致
-                if(values.containsKey(propertyDescriptor.getName())){
-                    //获取map的值
-                    Object value = values.get(propertyDescriptor.getName());
-                    Object[] args = new Object[1];
-                    args[0] = value;
-                    propertyDescriptor.getWriteMethod().invoke(t, args);
-                }else
-                    //判断map的值是否与属性名首字母大写是否一致（部分属性名大写，在数据库中小写）
-                    if(values.containsKey(propertyName)){
-                        Object value = values.get(propertyName);
-                        Object[] args = new Object[1];
-                        args[0] = value;
-                        propertyDescriptor.getWriteMethod().invoke(t, args);
-                    }
+            } else {
+                // 判断fieldName是否为空 如果是则直接给属性名称，如果不是空则给别名
+//                   if (fieldName == null || fieldName.equals("")) {
+//                       ClassUtil.setFieldValues(t, field, values.get(field.getName()));
+//                   } else {
+//                       ClassUtil.setFieldValues(t, field, mapToObject(field.getType(), (Map<String, Object>) values.get(String.valueOf(fieldName))));
+//                  }
+            // TODO 非基础类转换
+            }
+
+//        });
         }
         return t;
     }

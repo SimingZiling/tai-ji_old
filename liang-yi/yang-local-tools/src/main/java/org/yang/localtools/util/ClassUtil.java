@@ -7,13 +7,15 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.annotation.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.net.JarURLConnection;
 import java.net.URL;
 import java.net.URLDecoder;
-import java.util.Enumeration;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.text.ParseException;
+import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -237,38 +239,140 @@ public class ClassUtil {
     }
 
     /**
-     * 判断是否具有指定注解类型（JDK9中可以用）
+     * 判断类是否具有指定注解类型（JDK9中可以用）
      * @param clazz 需要判断的类
      * @param annotationClass 注解类
      * @param ergodic 是否进行遍历 true 进行遍历 false不进行遍历
      * @return  true 标识拥有该注解 false 没有该注解
      */
-    public static boolean verifyAnnotation(Class<?> clazz,Class<?> annotationClass,boolean ergodic){
-        // 获取到clazz的注解
-        Annotation[] annotations = clazz.getAnnotations();
-        if(annotations.length <= 0){
+    public static boolean verifyClassAnnotation(Class<?> clazz,Class<?> annotationClass,boolean ergodic){
+        // 获取到clazz的注解 并进行判断
+        return verifyAnnotation(clazz.getAnnotations(),annotationClass,ergodic);
+    }
+
+    /**
+     * 判断属性是否具有指定注解类型（JDK9中可以用）
+     * @param field 属性
+     * @param annotationClass 注解类
+     * @param ergodic 是否进行遍历 true 进行遍历 false不进行遍历
+     * @return  true 标识拥有该注解 false 没有该注解
+     */
+    public static boolean verifyFieldAnnotation(Field field,Class<?> annotationClass,boolean ergodic){
+        // 获取到属性的注解 并进行判断
+        return verifyAnnotation(field.getAnnotations(),annotationClass,ergodic);
+    }
+
+    /**
+     * 判断是否具有指定注解类型（JDK9中可以用）
+     * @param annotations 注解列表
+     * @param annotationClass 注解类
+     * @param ergodic 是否进行遍历 true 进行遍历 false不进行遍历
+     * @return  true 标识拥有该注解 false 没有该注解
+     */
+    private static boolean verifyAnnotation(Annotation[] annotations,Class<?> annotationClass,boolean ergodic){
+        // 判断注解列表是否为空
+        if(annotations == null || annotations.length == 0){
             return false;
         }
         // 开始遍历注解
         for (Annotation annotation : annotations){
-            if (annotation.annotationType() != Deprecated.class &&
-                    annotation.annotationType() != SuppressWarnings.class &&
-                    annotation.annotationType() != Override.class &&
-                    // 该注解为 JDK9中的注解
-                    annotation.annotationType() != Generated.class &&
-                    annotation.annotationType() != Target.class &&
-                    annotation.annotationType() != Retention.class &&
-                    annotation.annotationType() != Documented.class &&
-                    annotation.annotationType() != Inherited.class){
+            if (!isMetaAnnotation(annotation)){
                 if (annotation.annotationType() == annotationClass) {
                     return true;
                     // 判断是否进行迭代
                 } else if(ergodic){
-                    return  verifyAnnotation(annotation.annotationType(),annotationClass,ergodic);
+                    return  verifyClassAnnotation(annotation.annotationType(),annotationClass,ergodic);
                 }
             }
         }
         return false;
+    }
+
+    /**
+     * 获取注解值
+     * @param annotations 注解列表
+     * @param annotationClass 注解类
+     * @param valueName 值名称
+     * @return 值
+     */
+    public static Object getAnnotationValue(Annotation[] annotations, Class<?> annotationClass, String valueName){
+        Object object = null;
+        // 遍历注解列表
+        for (Annotation annotation : annotations){
+            // 排除元注解
+            if (!isMetaAnnotation(annotation)){
+                // 获取注解的值
+                object = getAnnotationValue(annotation,valueName);
+                // 当值为空 并且 注解不为最终注解时
+                if(object == null && annotation.annotationType() != annotationClass){
+                    return getAnnotationValue(annotation.annotationType().getAnnotations(), annotationClass,valueName);
+                }
+            }
+        }
+        return object;
+    }
+
+    /**
+     * 判断元注解
+     * @param annotation 注解
+     * @return 为true为元注解
+     */
+    private static boolean isMetaAnnotation(Annotation annotation){
+        return annotation.annotationType() == Deprecated.class ||
+                annotation.annotationType() == SuppressWarnings.class ||
+                annotation.annotationType() == Override.class ||
+                // 该注解为 JDK9中的注解
+                annotation.annotationType() == Generated.class ||
+                annotation.annotationType() == Target.class ||
+                annotation.annotationType() == Retention.class ||
+                annotation.annotationType() == Documented.class ||
+                annotation.annotationType() == Inherited.class;
+    }
+
+    /**
+     * 获取注解值
+     * @param annotation 注解
+     * @param valueName 值名称
+     * @return 值
+     */
+    public static Object getAnnotationValue(Annotation annotation,String valueName){
+        // 获取代理对象
+        InvocationHandler invo = Proxy.getInvocationHandler(annotation);
+        Map<String,Object> map = (Map<String, Object>) getFieldValue(invo,"memberValues");
+        if(map != null){
+            return map.get(valueName);
+        }
+        return null;
+    }
+
+
+    /**
+     * 获取属性的值
+     * @param object 对象
+     * @param fieldName 属性
+     * @return 值
+     */
+    public static <T> Object getFieldValue(T object,String fieldName)  {
+        // 获取类
+        Class<?> clazz = object.getClass();
+        Object fieldValue = null;
+        try {
+            // 获取类对应名称的属性
+            Field field = clazz.getDeclaredField(fieldName);
+            // 设置属性可访问
+            if(!field.canAccess(object)) {
+                field.setAccessible(true);
+                fieldValue = field.get(object);
+                field.setAccessible(false);
+            }else {
+                fieldValue = field.get(object);
+            }
+        } catch (NoSuchFieldException e) {
+            throw new IllegalArgumentException(clazz + "没有属性： " + fieldName);
+        }catch (IllegalAccessException e){
+            e.printStackTrace();
+        }
+        return fieldValue;
     }
 
     /**
@@ -288,4 +392,76 @@ public class ClassUtil {
         }
         throw new LocalToolsException(clazz.getName()+"中没有"+fieldName+"的get或者is方法！");
     }
+
+    /**
+     * 设置属性值
+     * @param object 对象
+     * @param field 对象属性
+     * @param value 值
+     * @param datePattern 时间格式
+     */
+    public static void setFieldValues(Object object,Field field,Object value,String datePattern) throws IllegalAccessException {
+        // 判断是有具有私有访问权限，如果没有则开启权限
+        if(field.canAccess(object)){
+            Class<?> fieldType = field.getType();
+            if(fieldType.equals(Integer.class) || fieldType.equals(int.class)){
+                if(value == null){
+                    field.set(object,0);
+                }else {
+                    field.set(object,Integer.valueOf(String.valueOf(value)));
+                }
+            }else if(fieldType.equals(Long.class) || fieldType.equals(long.class)){
+                if(value == null) {
+                    field.set(object, 0L);
+                }else {
+                    field.set(object,Long.valueOf(String.valueOf(value)));
+                }
+            }else if(fieldType.equals(String.class)){
+                field.set(object,String.valueOf(value));
+            }else if(fieldType.equals(Float.class) || fieldType.equals(float.class)){
+                if(value == null) {
+                    field.set(object, 0F);
+                }else {
+                    field.set(object, Float.valueOf(String.valueOf(value)));
+                }
+            }else if(fieldType.equals(Boolean.class) || fieldType.equals(boolean.class)){
+                if(value == null) {
+                    field.set(object, false);
+                }else {
+                    field.set(object,Boolean.valueOf(String.valueOf(value)));
+                }
+
+            }else if(fieldType.equals(Double.class) || fieldType.equals(double.class)){
+                if(value == null) {
+                    field.set(object, 0F);
+                }else {
+                    field.set(object,Boolean.valueOf(String.valueOf(value)));
+                }
+
+            }else if(fieldType.equals(Date.class)){
+                if(StringUtil.isNull(datePattern)){
+                    datePattern = "yyyy-MM-dd HH:mm:ss";
+                }
+                try {
+                    field.set(object,DateUtil.stringToDate(String.valueOf(value),datePattern));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            }
+        }else {
+            field.setAccessible(true);
+            setFieldValues(object, field, value,datePattern);
+            field.setAccessible(false);
+        }
+    }
+    /**
+     * 设置属性值
+     * @param object 对象
+     * @param field 对象属性
+     * @param value 值
+     */
+    public static void setFieldValues(Object object,Field field,Object value) throws IllegalAccessException {
+        setFieldValues(object, field, value, null);
+    }
+
 }

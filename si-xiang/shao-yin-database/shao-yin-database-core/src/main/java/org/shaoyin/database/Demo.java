@@ -48,13 +48,16 @@ public class Demo {
 ////        users.add(user3);
 //        System.out.println(Arrays.asList(session.insert(users)).toString());
         List<Object> list = new ArrayList<>();
-        list.add("中文2");
-        list.add("8");
+//        list.add("中文2");
+        list.add("11");
+//        list.add("中文");
 
 ////        System.out.println(session.delete("DELETE FROM user_s WHERE id_s = ? AND name = ?",list));
 //        System.out.println(session.delete(user2));
 
-        System.out.println(session.update("UPDATE user_s SET name = ? WHERE id_s = ?",list));
+//        System.out.println(session.update("UPDATE user_s SET name = ? WHERE id_s = ?",list));
+        System.out.println(session.select("SELECT * FROM user_s WHERE id_s = ?",list));
+//        System.out.println(session.selectList("SELECT * FROM user_s WHERE id_s = ?",list));
     }
 
 }

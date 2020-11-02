@@ -12,13 +12,18 @@ import java.util.Date;
 public class User {
 
     @Column(value = "id_s",key = true)
+//    @Alias("aa")
     private Integer id;
 
     private String name;
 
     private String email;
 
+    private String a;
+
     public Date birthday;
+
+    private User user;
 
     @Column(length = 10,decimals = 2)
     private Float ints;
@@ -48,6 +53,14 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     @Override

@@ -7,8 +7,12 @@ import org.shaoyin.database.session.Session;
 import org.shaoyin.database.sql.PackagSQL;
 import org.shaoyin.database.util.ColumnInfo;
 import org.yang.localtools.exception.LocalToolsException;
+import org.yang.localtools.util.ClassUtil;
+import org.yang.localtools.util.MapUtil;
 
+import java.beans.IntrospectionException;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -65,25 +69,46 @@ public class MySqlSessionImpl implements Session {
     }
 
     @Override
-    public int execSQL(String sql) throws SQLException {
-        return execSQL(sql,null);
+    public int execUpdateSQL(String sql) throws SQLException {
+        return execUpdateSQL(sql,null);
     }
 
     @Override
-    public int execSQL(String sql, List<Object> paramList) throws SQLException {
+    public int execUpdateSQL(String sql, List<Object> paramList) throws SQLException {
         return getPreparedStatement(sql,paramList).executeUpdate();
+    }
+
+    /**
+     * 执行查询SQL
+     * @param sql SQL语句
+     * @param paramList 参数列表
+     * @return 结果集
+     */
+    private ResultSet execQuerySQL(String sql, List<Object> paramList) throws SQLException {
+        return getPreparedStatement(sql,paramList).executeQuery();
+    }
+
+    /**
+     * 执行查询SQL
+     * @param sql SQL语句
+     * @return 结果集
+     */
+    private ResultSet execQuerySQL(String sql) throws SQLException {
+        return execQuerySQL(sql,null);
     }
 
     @Override
     public Object insert(String sql, List<Object> paramList, boolean isReturnPrimaryKey) throws SQLException, DatabaseCoreException {
 
-        int execResult = execSQL(sql,paramList);
+        int execResult = execUpdateSQL(sql,paramList);
         if(execResult != 0){
             if(isReturnPrimaryKey){
                 resultSet = preparedStatement.getGeneratedKeys();
                 resultSet.next();
                 return resultSet.getObject(1);
-            }else return execResult;
+            }else {
+                return execResult;
+            }
         }else {
             throw new DatabaseCoreException("添加失败！");
         }
@@ -103,18 +128,19 @@ public class MySqlSessionImpl implements Session {
     public <T> T insert(T t) throws LocalToolsException, DatabaseCoreException, SQLException {
         try {
             Field field = t.getClass().getDeclaredField(ColumnInfo.getKeyName(t.getClass(),true));
-            // 开启私有属性访问权限
-            field.setAccessible(true);
-            // 提交sql并设置返回结果
-            if(field.getType().equals(Integer.class) || field.getType().equals(int.class)){
-                field.set(t,Integer.valueOf(String.valueOf(insert(PackagSQL.insert(t),null,true))));
-            }else {
-                try {
-                    throw new DatabaseCoreException("未知属性："+field.getType());
-                }catch (DatabaseCoreException e){
-                    e.printStackTrace();
-                }
-            }
+//            // 开启私有属性访问权限
+//            field.setAccessible(true);
+//            // 提交sql并设置返回结果
+//            if(field.getType().equals(Integer.class) || field.getType().equals(int.class)){
+//                field.set(t,Integer.valueOf(String.valueOf(insert(PackagSQL.insert(t),null,true))));
+//            }else {
+//                try {
+//                    throw new DatabaseCoreException("未知属性："+field.getType());
+//                }catch (DatabaseCoreException e){
+//                    e.printStackTrace();
+//                }
+//            }
+            ClassUtil.setFieldValues(t,field,insert(PackagSQL.insert(t),null,true));
         } catch (NoSuchFieldException | IllegalAccessException e) {
             e.printStackTrace();
         }
@@ -132,104 +158,91 @@ public class MySqlSessionImpl implements Session {
 
     @Override
     public int delete(String sql, List<Object> paramList) throws SQLException {
-        return execSQL(sql,paramList);
+        return execUpdateSQL(sql,paramList);
     }
 
     @Override
     public int delete(String sql) throws SQLException {
-        return execSQL(sql);
+        return execUpdateSQL(sql);
     }
 
     @Override
     public <T> int delete(T t) throws SQLException {
-        return execSQL(PackagSQL.delete(t));
+        return execUpdateSQL(PackagSQL.delete(t));
+    }
+
+    @Override
+    public <T> void delete(List<T> tList) throws SQLException {
+        for (T t : tList){
+            execUpdateSQL(PackagSQL.delete(t));
+        }
     }
 
     @Override
     public int update(String sql, List<Object> paramList) throws SQLException {
-        return execSQL(sql,paramList);
+        return execUpdateSQL(sql,paramList);
     }
 
     @Override
     public int update(String sql) throws SQLException {
-        return execSQL(sql);
+        return execUpdateSQL(sql);
+    }
+
+    @Override
+    public Map<String, Object> select(String sql, List<Object> paramList) throws SQLException {
+        resultSet =  execQuerySQL(sql, paramList);
+        resultSet.last();
+        // 判断结果集是否大于1 如果是则抛出异常
+        if(resultSet.getRow() > 1){
+            throw new SQLException("期望获取结果为：1条数据，当前获取结果为："+resultSet.getRow()+"条数据！");
+        }
+        // 判断结果集是否等于0 如果是则返回空
+        if(resultSet.getRow() == 0){
+            return null;
+        }
+        resultSet.first();
+        return ObjectRelationMapping.handleResultSetToMap(resultSet);
+    }
+
+    @Override
+    public Map<String, Object> select(String sql) throws SQLException {
+        resultSet =  execQuerySQL(sql);
+        resultSet.last();
+        if(resultSet.getRow() != 1){
+            throw new SQLException("期望获取结果为：1条数据，当前获取结果为："+resultSet.getRow()+"条数据！");
+        }
+        resultSet.first();
+        return ObjectRelationMapping.handleResultSetToMap(resultSet);
+    }
+
+    @Override
+    public List<Map<String, Object>> selectList(String sql, List<Object> paramList) throws SQLException {
+        resultSet = execQuerySQL(sql, paramList);
+        return ObjectRelationMapping.handleResultSetToMapList(resultSet);
+    }
+
+    @Override
+    public List<Map<String, Object>> selectList(String sql) throws SQLException {
+        resultSet = execQuerySQL(sql);
+        return ObjectRelationMapping.handleResultSetToMapList(resultSet);
+    }
+
+    @Override
+    public <T> T select(String sql, List<Object> paramList, Class<T> clazz) throws SQLException {
+//        try {
+//            Map<String,Object> map = select(sql,paramList);
+//            if(map == null){
+//                return null;
+//            }
+//            return MapUtil.mapToObject(clazz,map);
+//        } catch (IntrospectionException | NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException | NoSuchFieldException e) {
+//            e.printStackTrace();
+//            return null;
+//        }
+        return null;
     }
 
 
-//
-//    @Override
-//    public int delete(String sql, List<Object> paramList) throws SQLException {
-//        // 删除和更新采用同一个接口
-//        return update(sql,paramList);
-//    }
-//
-//    @Override
-//    public <T> int delete(T t) {
-//        return 0;
-//    }
-//
-//    @Override
-//    public <T> int delete(List<T> tList) {
-//        return 0;
-//    }
-//
-//    @Override
-//    public <T> int delete(Class<T> clazz, Map<String, Object> paramMap) {
-//        return 0;
-//    }
-//
-//    @Override
-//    public <T> int delete(Class<T> clazz, List<Map<String, Object>> paramMapList) {
-//        return 0;
-//    }
-//
-//    @Override
-//    public int update(String sql, List<Object> paramList) throws SQLException {
-//        return getPreparedStatement(sql, paramList).executeUpdate();
-//    }
-//
-//    @Override
-//    public <T> int update(T t) {
-//        return 0;
-//    }
-//
-//    @Override
-//    public <T> int update(List<T> tList) {
-//        return 0;
-//    }
-//
-//    @Override
-//    public <T> int update(Class<T> clazz, Map<String, Object> paramMap) {
-//        return 0;
-//    }
-//
-//    @Override
-//    public <T> int update(Class<T> clazz, List<Map<String, Object>> paramMapList) {
-//        return 0;
-//    }
-//
-//    @Override
-//    public Map<String, Object> select(String sql, List<Object> paramList) throws SQLException {
-//        // 将结果集转换为Map
-//        return ObjectRelationMapping.handleResultSetToMap(getQueryResultSet(sql, paramList));
-//    }
-//
-//    @Override
-//    public List<Map<String, Object>> selectList(String sql, List<Object> paramList) throws SQLException {
-//        // 将结果集转换为Map列表
-//        return ObjectRelationMapping.handleResultSetToMapList(getQueryResultSet(sql, paramList));
-//    }
-//
-//    @Override
-//    public <T> T select(String sql, List<Object> paramList, Class<T> clazz) {
-//        return null;
-//    }
-//
-//    @Override
-//    public <T> List<T> selectList(String sql, List<Object> paramList, Class<T> clazz) {
-//        return null;
-//    }
-//
     /**
      * 获取声明
      * @param sql sql语句
@@ -250,15 +263,6 @@ public class MySqlSessionImpl implements Session {
         return preparedStatement;
     }
 
-    /**
-     * 获取查询结果集
-     * @param sql SQL语句
-     * @param paramList 参数列表
-     * @return 结果集
-     */
-    private ResultSet getQueryResultSet(String sql, List<Object> paramList) throws SQLException {
-        return getPreparedStatement(sql,paramList).executeQuery();
-    }
 
     /**
      * 关闭结果集
