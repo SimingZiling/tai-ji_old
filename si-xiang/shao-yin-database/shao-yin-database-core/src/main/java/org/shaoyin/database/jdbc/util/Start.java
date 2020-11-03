@@ -12,7 +12,7 @@ public class Start {
 
         // 构建数据库配置
         DatabaseConfiguration.setDriverClass("com.mysql.cj.jdbc.Driver");
-        DatabaseConfiguration.setUrl("jdbc:mysql://132.232.19.205:3306/mangge?autoReconnect=true&useSSL=false&serverTimezone=GMT%2b8&characterEncoding=utf8&allowMultiQueries=true");
+        DatabaseConfiguration.setUrl("jdbc:mysql://132.232.19.205:3306/demo?autoReconnect=true&useSSL=false&serverTimezone=GMT%2b8&characterEncoding=utf8&allowMultiQueries=true");
         DatabaseConfiguration.setPassword("angel83528358");
         DatabaseConfiguration.setUser("root");
 

@@ -59,30 +59,29 @@ public class MapUtil {
         for(Field field : fields) {
             // 获取别名属性
             Object fieldName = ClassUtil.getAnnotationValue(field.getAnnotations(), Alias.class, "value");
-            // 如果fieldName为空则从方法中获取值
+            // 如果fieldName为空则从方法中获取值 否则fieldName = field.getName();
             if (fieldName == null || fieldName.equals("")) {
                 try {
                     // 获取get或者is方法
                     Method method = ClassUtil.getGetOrIsMethod(clazz, field.getName());
                     // 获取方法注解
                     fieldName = ClassUtil.getAnnotationValue(method.getDeclaredAnnotations(), Alias.class, "value");
-                } catch (LocalToolsException ignored) {}
-            }
-            if (field.getType().getClassLoader() == null) {
-                // 判断fieldName是否为空 如果是则直接给属性名称，如果不是空则给别名
-                if (fieldName == null || fieldName.equals("")) {
-                    ClassUtil.setFieldValues(t, field, values.get(field.getName()));
-                } else {
-                    ClassUtil.setFieldValues(t, field, values.get(String.valueOf(fieldName)));
+                } catch (LocalToolsException ignored) {
+                    fieldName = field.getName();
                 }
-            } else {
-                // 判断fieldName是否为空 如果是则直接给属性名称，如果不是空则给别名
-//                   if (fieldName == null || fieldName.equals("")) {
-//                       ClassUtil.setFieldValues(t, field, values.get(field.getName()));
-//                   } else {
-//                       ClassUtil.setFieldValues(t, field, mapToObject(field.getType(), (Map<String, Object>) values.get(String.valueOf(fieldName))));
-//                  }
-            // TODO 非基础类转换
+            }
+            if(fieldName == null || fieldName.equals("")){
+                fieldName = field.getName();
+            }
+            // TODO 此处用类加载器判断是否为JAVA类型，未知是否存在问题
+            Object value = values.get(String.valueOf(fieldName));
+            if(value != null) {
+                // 当属性类型为java基础类型时 直接加载
+                if (field.getType().getClassLoader() == null) {
+                    ClassUtil.setFieldValues(t, field, value);
+                } else {
+                    ClassUtil.setFieldValues(t, field, mapToObject(field.getType(), (Map<String, Object>) value));
+                }
             }
 
 //        });

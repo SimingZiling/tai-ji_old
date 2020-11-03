@@ -404,41 +404,40 @@ public class ClassUtil {
         // 判断是有具有私有访问权限，如果没有则开启权限
         if(field.canAccess(object)){
             Class<?> fieldType = field.getType();
-            if(fieldType.equals(Integer.class) || fieldType.equals(int.class)){
-                if(value == null){
-                    field.set(object,0);
-                }else {
+            // 8中基础类型转换
+            if(fieldType.equals(int.class) || fieldType.equals(Integer.class)){
+                if(value != null){
                     field.set(object,Integer.valueOf(String.valueOf(value)));
                 }
-            }else if(fieldType.equals(Long.class) || fieldType.equals(long.class)){
-                if(value == null) {
-                    field.set(object, 0L);
-                }else {
+            }else if(fieldType.equals(byte.class) || fieldType.equals(Byte.class)){
+                if(value != null){
+                    field.set(object, Byte.valueOf(String.valueOf(value)));
+                }
+            }else if(fieldType.equals(short.class) || fieldType.equals(Short.class)){
+                if(value != null){
+                    field.set(object, Short.valueOf(String.valueOf(value)));
+                }
+            }else if(fieldType.equals(long.class) || fieldType.equals(Long.class)){
+                if(value != null){
                     field.set(object,Long.valueOf(String.valueOf(value)));
                 }
-            }else if(fieldType.equals(String.class)){
-                field.set(object,String.valueOf(value));
-            }else if(fieldType.equals(Float.class) || fieldType.equals(float.class)){
-                if(value == null) {
-                    field.set(object, 0F);
-                }else {
-                    field.set(object, Float.valueOf(String.valueOf(value)));
+            }else if(fieldType.equals(float.class) || fieldType.equals(Float.class)){
+                if(value != null){
+                    field.set(object,Float.valueOf(String.valueOf(value)));
                 }
-            }else if(fieldType.equals(Boolean.class) || fieldType.equals(boolean.class)){
-                if(value == null) {
-                    field.set(object, false);
-                }else {
-                    field.set(object,Boolean.valueOf(String.valueOf(value)));
+            }else if(fieldType.equals(double.class) || fieldType.equals(Double.class)){
+                if(value != null){
+                    field.set(object,Double.valueOf(String.valueOf(value)));
                 }
-
-            }else if(fieldType.equals(Double.class) || fieldType.equals(double.class)){
-                if(value == null) {
-                    field.set(object, 0F);
-                }else {
-                    field.set(object,Boolean.valueOf(String.valueOf(value)));
+            }else if(fieldType.equals(boolean.class) || fieldType.equals(Boolean.class)){
+                if(value != null){
+                    field.set(object, Boolean.valueOf(String.valueOf(value)));
                 }
-
-            }else if(fieldType.equals(Date.class)){
+            }else if(fieldType.equals(char.class) || fieldType.equals(Character.class)){
+                if(value != null){
+                    field.set(object, (Character) value);
+                }
+            } else if(fieldType.equals(Date.class)){
                 if(StringUtil.isNull(datePattern)){
                     datePattern = "yyyy-MM-dd HH:mm:ss";
                 }
@@ -447,6 +446,9 @@ public class ClassUtil {
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
+            }else {
+                // 如果不是以上基础类型则直接副职
+                field.set(object,value);
             }
         }else {
             field.setAccessible(true);

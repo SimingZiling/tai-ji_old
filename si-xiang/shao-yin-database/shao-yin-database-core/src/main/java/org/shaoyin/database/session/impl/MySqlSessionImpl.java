@@ -128,18 +128,7 @@ public class MySqlSessionImpl implements Session {
     public <T> T insert(T t) throws LocalToolsException, DatabaseCoreException, SQLException {
         try {
             Field field = t.getClass().getDeclaredField(ColumnInfo.getKeyName(t.getClass(),true));
-//            // 开启私有属性访问权限
-//            field.setAccessible(true);
-//            // 提交sql并设置返回结果
-//            if(field.getType().equals(Integer.class) || field.getType().equals(int.class)){
-//                field.set(t,Integer.valueOf(String.valueOf(insert(PackagSQL.insert(t),null,true))));
-//            }else {
-//                try {
-//                    throw new DatabaseCoreException("未知属性："+field.getType());
-//                }catch (DatabaseCoreException e){
-//                    e.printStackTrace();
-//                }
-//            }
+            // 设置主键
             ClassUtil.setFieldValues(t,field,insert(PackagSQL.insert(t),null,true));
         } catch (NoSuchFieldException | IllegalAccessException e) {
             e.printStackTrace();
@@ -229,17 +218,36 @@ public class MySqlSessionImpl implements Session {
 
     @Override
     public <T> T select(String sql, List<Object> paramList, Class<T> clazz) throws SQLException {
-//        try {
-//            Map<String,Object> map = select(sql,paramList);
-//            if(map == null){
-//                return null;
-//            }
-//            return MapUtil.mapToObject(clazz,map);
-//        } catch (IntrospectionException | NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException | NoSuchFieldException e) {
-//            e.printStackTrace();
-//            return null;
-//        }
-        return null;
+        try {
+            return MapUtil.mapToObject(clazz,select(sql,paramList));
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException | IntrospectionException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
+    public <T> T select(String sql, Class<T> clazz) throws SQLException {
+        return select(sql,null,clazz);
+    }
+
+    @Override
+    public <T> List<T> selectList(String sql, List<Object> paramList, Class<T> clazz) throws SQLException {
+        List<Map<String,Object>> mapList = selectList(sql, paramList);
+        List<T> tList = new ArrayList<>();
+        mapList.forEach(map -> {
+            try {
+                tList.add(MapUtil.mapToObject(clazz,map));
+            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException | IntrospectionException e) {
+                e.printStackTrace();
+            }
+        });
+        return tList;
+    }
+
+    @Override
+    public <T> List<T> selectList(String sql, Class<T> clazz) throws SQLException {
+        return selectList(sql,null,clazz);
     }
 
 

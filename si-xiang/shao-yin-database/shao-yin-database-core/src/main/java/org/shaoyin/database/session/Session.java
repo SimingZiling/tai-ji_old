@@ -177,6 +177,38 @@ public interface Session {
       */
      List<Map<String,Object>> selectList(String sql) throws SQLException;
 
+     /**
+      * 查询数据
+      * @param sql sql语句
+      * @param paramList 参数
+      * @param clazz 类
+      * @return 对象
+      */
      <T> T select(String sql,List<Object> paramList,Class<T> clazz) throws SQLException;
+
+     /**
+      * 查询数据
+      * @param sql sql语句
+      * @param clazz 类
+      * @return 对象
+      */
+     <T> T select(String sql,Class<T> clazz) throws SQLException;
+
+     /**
+      * 查询数据列表
+      * @param sql sql语句
+      * @param paramList 参数
+      * @param clazz 类
+      * @return 对象
+      */
+     <T> List<T> selectList(String sql,List<Object> paramList,Class<T> clazz) throws SQLException;
+
+     /**
+      * 查询数据列表
+      * @param sql sql语句
+      * @param clazz 类
+      * @return 对象
+      */
+     <T> List<T> selectList(String sql,Class<T> clazz) throws SQLException;
 
 }
