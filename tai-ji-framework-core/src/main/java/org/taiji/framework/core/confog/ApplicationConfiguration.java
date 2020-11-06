@@ -51,6 +51,7 @@ public class ApplicationConfiguration {
         } catch (FileNotFoundException e) {
             logger.error("application文件不存在！");
             e.printStackTrace();
+            System.exit(1);
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -31,6 +31,9 @@ public class DispatcherServlet extends HttpServlet {
         RequestHandler requestHandler =  RequestHandlerMapping.getRequestHandler(url);
         // 这是返回字符集
         resp.setCharacterEncoding(WebServletConfiguration.getCharacterEncoding());
+        // 返回UTF-8编码
+        // TODO 未能设置，目前固定诶UTF-8
+        resp.setContentType("text/html;charset=utf-8");
         // 当handler不存时返回404
         if(requestHandler == null){
             // TODO 目前为最简单的404实现

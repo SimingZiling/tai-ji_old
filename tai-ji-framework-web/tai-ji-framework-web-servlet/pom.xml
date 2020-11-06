@@ -31,8 +31,8 @@
     </dependency>
 
     <dependency>
-      <groupId>org.dao</groupId>
-      <artifactId>taiji-framework-core</artifactId>
+      <groupId>org.taiji</groupId>
+      <artifactId>tai-ji-framework-core</artifactId>
     </dependency>
 
   </dependencies>
