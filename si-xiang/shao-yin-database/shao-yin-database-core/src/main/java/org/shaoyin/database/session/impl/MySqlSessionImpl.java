@@ -1,6 +1,7 @@
 package org.shaoyin.database.session.impl;
 
 import org.shaoyin.database.exception.DatabaseCoreException;
+import org.shaoyin.database.exception.DoNotCreateException;
 import org.shaoyin.database.jdbc.pool.ConnectionPool;
 import org.shaoyin.database.orm.ObjectRelationMapping;
 import org.shaoyin.database.session.Session;
@@ -76,6 +77,16 @@ public class MySqlSessionImpl implements Session {
     @Override
     public int execUpdateSQL(String sql, List<Object> paramList) throws SQLException {
         return getPreparedStatement(sql,paramList).executeUpdate();
+    }
+
+    @Override
+    public void createTable(Class<?> clazz) throws DoNotCreateException, SQLException {
+        execUpdateSQL(PackagSQL.createTable(clazz));
+    }
+
+    @Override
+    public void deleteTable(Class<?> clazz) throws DoNotCreateException, SQLException {
+        execUpdateSQL(PackagSQL.deleteTable(clazz));
     }
 
     /**

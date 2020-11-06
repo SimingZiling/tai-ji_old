@@ -22,9 +22,15 @@ public class ConnectionPoolConfiguration {
         return connectionMaxNumber;
     }
 
+    public static void setConnectionMaxNumber(int connectionMaxNumber) {
+        ConnectionPoolConfiguration.connectionMaxNumber = connectionMaxNumber;
+    }
 
     public static int getConnectionMinNumber() {
         return connectionMinNumber;
     }
 
+    public static void setConnectionMinNumber(int connectionMinNumber) {
+        ConnectionPoolConfiguration.connectionMinNumber = connectionMinNumber;
+    }
 }

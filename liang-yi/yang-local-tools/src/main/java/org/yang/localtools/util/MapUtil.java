@@ -83,8 +83,6 @@ public class MapUtil {
                     ClassUtil.setFieldValues(t, field, mapToObject(field.getType(), (Map<String, Object>) value));
                 }
             }
-
-//        });
         }
         return t;
     }

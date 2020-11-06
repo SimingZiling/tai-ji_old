@@ -2,6 +2,7 @@ package org.shaoyin.database.session;
 
 
 import org.shaoyin.database.exception.DatabaseCoreException;
+import org.shaoyin.database.exception.DoNotCreateException;
 import org.yang.localtools.exception.LocalToolsException;
 
 import java.sql.SQLException;
@@ -50,6 +51,13 @@ public interface Session {
       */
      int execUpdateSQL(String sql,List<Object> paramList) throws SQLException;
 
+     /**
+      * 创建表
+      * @param clazz 类
+      */
+     void createTable(Class<?> clazz) throws DoNotCreateException, SQLException;
+
+     void deleteTable(Class<?> clazz) throws DoNotCreateException, SQLException;
 
      /**
       * 插入数据
@@ -90,23 +98,6 @@ public interface Session {
       */
      <T> List<T> insert(List<T> tList) throws DatabaseCoreException, SQLException, LocalToolsException;
 
-
-//     /**
-//      * 插入数据
-//      * @param clazz 对象
-//      * @param param 参数
-//      * @return 对象
-//      */
-//     <T> T insert(Class<T> clazz, Map<String,Object> param);
-//
-//     /**
-//      * 批量插入数据
-//      * @param clazz 类
-//      * @param paramList 参数列表
-//      * @return 对象列表
-//      */
-//     <T> List<T> insert(Class<T> clazz,List<Map<String,Object>> paramList);
-//
 
      /**
       * 删除数据

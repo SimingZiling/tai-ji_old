@@ -17,11 +17,6 @@ public class ColumnInfo {
      * @return 字段名
      */
     public static String getFieldName(Column column, String fieldName){
-//        if(column == null || column.value().equals("")){
-//            return "`"+fieldName+"`";
-//        }else {
-//            return "`"+column.value()+"`";
-//        }
         if(column == null || column.value().equals("")){
             return fieldName;
         }else {

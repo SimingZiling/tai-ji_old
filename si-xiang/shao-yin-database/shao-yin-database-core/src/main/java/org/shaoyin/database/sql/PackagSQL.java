@@ -179,7 +179,7 @@ public class PackagSQL {
         if(entity.isAnnotationPresent(Table.class)){
             // 创建语句
             StringBuilder stringBuilder = new StringBuilder("CREATE TABLE ");
-            stringBuilder.append(getTableName(entity)).append("(");
+            stringBuilder.append("`").append(getTableName(entity)).append("`(");
             // 获取属性
             Field[] fields = entity.getDeclaredFields();
             // 进行属性遍历
@@ -242,7 +242,7 @@ public class PackagSQL {
      */
     public static String deleteTable(Class<?> entity) throws DoNotCreateException {
         if(entity.isAnnotationPresent(Table.class)){
-            return "DROP TABLE " + getTableName(entity) + ";";
+            return "DROP TABLE `" + getTableName(entity) + "`;";
         }else {
             throw new DoNotCreateException(entity.getName()+" 该实体没有Table注解，不删除表！");
         }

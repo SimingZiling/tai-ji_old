@@ -9,10 +9,10 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>si-xiang</artifactId>
+    <artifactId>tai-ji-framework-web</artifactId>
     <packaging>pom</packaging>
     <modules>
-        <module>shao-yin-database</module>
+        <module>tai-ji-framework-web-servlet</module>
     </modules>
 
 
