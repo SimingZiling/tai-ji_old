@@ -42,6 +42,12 @@
       <artifactId>taiji-framework-web-servlet</artifactId>
       <version>1.0-SNAPSHOT</version>
     </dependency>
+
+    <dependency>
+      <groupId>org.taiji</groupId>
+      <artifactId>shao-yin-database-for-tai-ji</artifactId>
+      <version>1.0-SNAPSHOT</version>
+    </dependency>
   </dependencies>
 
   <build>

@@ -1,11 +1,15 @@
 package org.taiji.framework.core.module;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.*;
 
 /**
  * 模块加载器，负责各个模块加载
  */
 public class ModuleLoader {
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private Set<Class<?>> moduleClases = new HashSet<>();
 
@@ -13,22 +17,9 @@ public class ModuleLoader {
      * 加载
      */
     public void load(){
+        logger.info("开始加载模块");
         ServiceLoader<Module> serviceLoader = ServiceLoader.load(Module.class);
-        for (Module module : serviceLoader){
-//            moduleClases.add(module.getClass());
-            module.init();
-        }
+        serviceLoader.forEach(Module::init);
     }
 
-    public static void main(String[] args){
-        ModuleLoader moduleLoader = new ModuleLoader();
-        moduleLoader.load();
-    }
-
-
-//    public static void main(String[] args) {
-//        getAllClassByInterface(Module.class).forEach(aClass -> {
-//           System.out.println(aClass.getName());
-//        });
-//    }
 }

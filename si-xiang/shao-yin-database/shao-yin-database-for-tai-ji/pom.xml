@@ -11,5 +11,12 @@
     <name>shao-yin-database-for-tai-ji</name>
     <url>http://maven.apache.org</url>
     <dependencies>
+
+        <dependency>
+            <groupId>org.taiji</groupId>
+            <artifactId>tai-ji-framework-core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
     </dependencies>
 </project>
