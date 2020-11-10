@@ -1,4 +1,11 @@
 package org.taiji.example.dao;
 
-public class ExampleDao {
+import org.taiji.example.model.Example;
+
+public interface ExampleDao {
+
+    void save(Example example);
+
+
+
 }

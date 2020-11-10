@@ -1,12 +1,12 @@
-package org.taiji.framework.core.beans;
+package org.taiji.framework.beans;
 
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.taiji.framework.core.beans.annotation.Bean;
-import org.taiji.framework.core.beans.annotation.Inject;
-import org.taiji.framework.core.beans.config.BeanConfiguration;
-import org.taiji.framework.core.beans.exception.BeanException;
+import org.taiji.framework.beans.annotation.Bean;
+import org.taiji.framework.beans.annotation.Inject;
+import org.taiji.framework.beans.config.BeanConfiguration;
+import org.taiji.framework.beans.exception.BeanException;
 import org.yang.localtools.util.ClassUtil;
 import org.yang.localtools.util.StringUtil;
 
@@ -17,7 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-public class BeanFactory{
+public class BeanFactory {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -29,7 +29,7 @@ public class BeanFactory{
     /**
      * 初始化bean
      */
-    public void initBean(){
+    public void doLoadBean(){
         logger.info("开始初始化Bean");
 
         // 扫描包
@@ -37,7 +37,9 @@ public class BeanFactory{
 
         // 实例化对象
         doInstantiateObject();
-
+//        for (String s : BeanConfiguration.getScanPackages()){
+//            System.out.println(s);
+//        }
         // 依赖注入
         doDependencyInjection();
 
@@ -48,7 +50,7 @@ public class BeanFactory{
      */
     private void doDependencyInjection(){
         logger.info("开始进行依赖注入");
-        Beans.beanInfoMap.forEach((key,value) ->{
+        Beans.beanInfoMap.forEach((key, value) ->{
             // 获取到所有属性
             Field[] fields = value.getBeanClass().getDeclaredFields();
             Arrays.stream(fields).forEach(field -> {
@@ -66,9 +68,10 @@ public class BeanFactory{
                                 beanName = inject.value();
                             }
                             if(!Beans.beanInfoMap.containsKey(beanName)){
+
+                                // TODO 自定义Bean
                                 throw new BeanException("没有名字为："+beanName+"的Bean！");
                             }
-
                             // 注入到对象中
                             ClassUtil.setFieldValues(value.getBeanObject(),field,Beans.beanInfoMap.get(beanName).getBeanObject());
                         } catch (BeanException | IllegalAccessException e) {
@@ -105,7 +108,7 @@ public class BeanFactory{
     }
 
     private String getBeanName(Class<?> beanClass){
-        String beanName = (String) ClassUtil.getAnnotationValue(beanClass.getAnnotations(),Bean.class,"value");
+        String beanName = (String) ClassUtil.getAnnotationValue(beanClass.getAnnotations(), Bean.class,"value");
         if(StringUtil.isNull(beanName)){
             // 获取接口类
             Class<?>[] interfacesClass = beanClass.getInterfaces();
@@ -120,14 +123,17 @@ public class BeanFactory{
         }
     }
 
-
-
     /**
      * 扫描包，扫描完成后存放到beanInfos列表中，等待后续使用
      */
     private void doScanPackages() {
         logger.info("开始扫描包获取Bean");
-        Set<Class<?>> beanClassList = ClassUtil.scanClases(BeanConfiguration.getScanPackages());
+        List<String> scanPackageList = BeanConfiguration.getScanPackages();
+        String[] scanPackages = new String[scanPackageList.size()];
+        for (int i = 0;i<scanPackageList.size();i++){
+            scanPackages[i] = scanPackageList.get(i);
+        }
+        Set<Class<?>> beanClassList = ClassUtil.scanClases(scanPackages);
         beanClassList.forEach(beanClass ->{
             // 判断当clazz 不是注解的时候记录到bean中，并且迭代判断是否具有Bean注解
             if(!beanClass.isAnnotation() && ClassUtil.verifyClassAnnotation(beanClass, Bean.class,true)) {

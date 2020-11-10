@@ -1,4 +1,4 @@
-package org.taiji.framework.core.beans.exception;
+package org.taiji.framework.beans.exception;
 
 import org.taiji.framework.core.exception.TaiJiFrameworkCoreException;
 

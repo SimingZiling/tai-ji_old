@@ -1,4 +1,4 @@
-package org.taiji.framework.core.beans.annotation;
+package org.taiji.framework.beans.annotation;
 
 import java.lang.annotation.*;
 

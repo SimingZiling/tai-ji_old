@@ -1,14 +1,12 @@
-package org.taiji.framework.core.beans.annotation;
+package org.taiji.framework.beans.annotation;
 
 import java.lang.annotation.*;
 
-/**
- * Bean注解，
- */
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface Bean {
+@Bean
+public @interface Dao {
 
     String value() default "";
 

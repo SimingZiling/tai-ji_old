@@ -1,4 +1,4 @@
-package org.taiji.framework.core.beans;
+package org.taiji.framework.beans;
 
 /**
  * Bean信息

@@ -1,7 +1,7 @@
-package org.taiji.framework.core.beans;
+package org.taiji.framework.beans;
 
 
-import java.util.ArrayList;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,7 +14,7 @@ public class Beans {
     /**
      * benaMap集合
      */
-    protected static Map<String,BeanInfo> beanInfoMap = new HashMap<>();
+    protected static Map<String, BeanInfo> beanInfoMap = new HashMap<>();
 
     /**
      * 通过bean名称获取bean对象
@@ -25,7 +25,7 @@ public class Beans {
         return beanInfoMap.get(benaName).getBeanObject();
     }
 
-    public static Map<String,BeanInfo> getBeanInfoMap(){
+    public static Map<String, BeanInfo> getBeanInfoMap(){
         return beanInfoMap;
     }
 }

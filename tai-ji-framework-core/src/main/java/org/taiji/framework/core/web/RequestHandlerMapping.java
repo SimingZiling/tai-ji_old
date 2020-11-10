@@ -26,6 +26,10 @@ public class RequestHandlerMapping {
         return requestHandlerMap.get(url);
     }
 
+    public static Map<String, RequestHandler> getRequestHandlerMap() {
+        return requestHandlerMap;
+    }
+
     public void doInitRequestHandlerMapping(Object beanObject){
         Class<?> beanClass = beanObject.getClass();
         // 判断bena是否有RequestMapping注解
