@@ -14,38 +14,26 @@ public class DatabaseForTaiJiConfiguration implements Configuration {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-//    @Override
-//    public void distribution() throws DatabaseException {
-//        logger.info("配置信息分发至ORM配置");
-//
-//        // 添加指定扫描路径
-//        BeanConfiguration.setScanPackages("org.shaoyin.database.session.impl");
-//        // 加载数据库配置
-//        loudDatabaseConfiguration();
-//        // 加载连接池配置
-//        loudConnectionPoolConfiguration();
-//
-//    }
 
     /**
      * 加载数据库配置
      */
     private void loudDatabaseConfiguration() throws ApplicationConfigurationException {
-        DatabaseConfiguration.setDriverClass(getConfiguration("shao-yin-driverClass",true));
-        DatabaseConfiguration.setUrl(getConfiguration("shao-yin-url",true));
-        DatabaseConfiguration.setUser(getConfiguration("shao-yin-user",true));
-        DatabaseConfiguration.setPassword(getConfiguration("shao-yin-password",true));
+        DatabaseConfiguration.setDriverClass(getConfiguration("shaoyin.driverClass",true));
+        DatabaseConfiguration.setUrl(getConfiguration("shaoyin.url",true));
+        DatabaseConfiguration.setUser(getConfiguration("shaoyin.user",true));
+        DatabaseConfiguration.setPassword(getConfiguration("shaoyin.password",true));
     }
 
     /**
      * 加载连接池配置
      */
     private void loudConnectionPoolConfiguration() throws ApplicationConfigurationException {
-        String maxConnection = getConfiguration("shao-yin-maxConnection",false);
+        String maxConnection = getConfiguration("shaoyin.maxConnection",false);
         if(maxConnection != null) {
             ConnectionPoolConfiguration.setConnectionMaxNumber(Integer.parseInt(maxConnection));
         }
-        String minConnection = getConfiguration("shao-yin-minConnection",false);
+        String minConnection = getConfiguration("shaoyin.minConnection",false);
         if(minConnection != null) {
             ConnectionPoolConfiguration.setConnectionMinNumber(Integer.parseInt(minConnection));
         }

@@ -1,13 +1,10 @@
 package org.taiji.example.controller;
 
-import org.shaoyin.database.exception.DoNotCreateException;
-import org.shaoyin.database.sql.PackagSQL;
 import org.taiji.example.model.Example;
 import org.taiji.example.service.ExampleService;
 import org.taiji.framework.beans.annotation.Controller;
 import org.taiji.framework.beans.annotation.Inject;
 import org.taiji.framework.core.web.annotation.RequestMapping;
-import org.taiji.framework.core.web.annotation.RequestMethod;
 import org.taiji.framework.core.web.annotation.RequestParam;
 import org.yin.networktools.response.ResponseCode;
 import org.yin.networktools.response.ResponseData;
