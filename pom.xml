@@ -13,7 +13,6 @@
         <module>si-xiang</module>
         <module>tai-ji-framework-core</module>
         <module>tai-ji-framework-web</module>
-        <module>tai-ji-example</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -49,14 +48,20 @@
                 <version>1.0-SNAPSHOT</version>
             </dependency>
 
-            <dependency>
-                <groupId>org.taiji</groupId>
-                <artifactId>tai-ji-framework-core</artifactId>
-                <version>1.0-SNAPSHOT</version>
-            </dependency>
-
         </dependencies>
 
     </dependencyManagement>
+
+    <distributionManagement>
+        <repository>
+            <id>releases</id>
+            <url>http://nexus.zhongyimeika.com/repository/maven-releases/</url>
+        </repository>
+
+        <snapshotRepository>
+            <id>snapshots</id>
+            <url>http://nexus.zhongyimeika.com/repository/maven-snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
 
 </project>

@@ -12,7 +12,7 @@
     <artifactId>si-xiang</artifactId>
     <packaging>pom</packaging>
     <modules>
-        <module>shao-yin-database</module>
+        <module>shao-yin-orm</module>
     </modules>
 
 
