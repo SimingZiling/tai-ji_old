@@ -15,6 +15,7 @@ public class CharUtil {
      * @param c 检测字符
      * @return 空白字符
      */
+    @Deprecated
     public static boolean isBlank(char c) {
         return isBlank((int) c);
     }
@@ -24,6 +25,7 @@ public class CharUtil {
      * @param c 检测字符
      * @return 是否为空白字符
      */
+    @Deprecated
     public static boolean isBlank(int c) {
         return Character.isWhitespace(c)
                 || Character.isSpaceChar(c)

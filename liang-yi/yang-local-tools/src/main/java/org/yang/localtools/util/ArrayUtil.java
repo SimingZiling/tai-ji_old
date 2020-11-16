@@ -19,7 +19,6 @@ public class ArrayUtil {
 
     /**
      * 对象是否为数组对象
-     *
      * @param object 对象
      * @return 是否为数组对象
      */
@@ -35,7 +34,7 @@ public class ArrayUtil {
      * @param object 集合或数组对象
      * @return 数组字符串，与集合转字符串格式相同
      */
-    public static String toString(Object object) {
+    public static String arrayToString(Object object) {
         if (null == object) {
             return null;
         }
@@ -61,7 +60,6 @@ public class ArrayUtil {
             try {
                 return Arrays.deepToString((Object[]) object);
             } catch (Exception ignore) {
-                //ignore
             }
         }
 

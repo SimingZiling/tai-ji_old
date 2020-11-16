@@ -109,7 +109,7 @@ public class BeanFactory {
 
     private String getBeanName(Class<?> beanClass){
         String beanName = (String) ClassUtil.getAnnotationValue(beanClass.getAnnotations(), Bean.class,"value");
-        if(StringUtil.isNull(beanName)){
+        if(StringUtil.isBlank(beanName)){
             // 获取接口类
             Class<?>[] interfacesClass = beanClass.getInterfaces();
             // 如果类存在接口则获取第一个接口名称为bean名称

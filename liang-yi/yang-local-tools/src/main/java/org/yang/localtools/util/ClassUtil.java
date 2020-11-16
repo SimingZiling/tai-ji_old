@@ -438,7 +438,7 @@ public class ClassUtil {
                     field.set(object, (Character) value);
                 }
             } else if(fieldType.equals(Date.class)){
-                if(StringUtil.isNull(datePattern)){
+                if(StringUtil.isBlank(datePattern)){
                     datePattern = "yyyy-MM-dd HH:mm:ss";
                 }
                 try {

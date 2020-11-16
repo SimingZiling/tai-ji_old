@@ -1,11 +1,6 @@
 package org.yang.localtools.util;
 
 
-import java.nio.ByteBuffer;
-//import java.nio.charset.Charset;
-//import java.nio.charset.StandardCharsets;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -68,23 +63,12 @@ public class StringUtil{
     }
 
     /**
-     * 验证是否为空
-     * @param str 字符串
-     * @return true 为空 false 不为空
-     *  // TODO 通过时方法 后续会删除
-     */
-    @Deprecated
-    public static boolean isNull(String str){
-        return str == null || str.equals("");
-    }
-
-
-    /**
      * 检测字符串是否为空白字符串
      * 定义：空字符串，空格、制表符、换行符等不见字符均为空白字符串
      * @param str 检测的字符串
      * @return 若为空白则返回 true
      */
+    @Deprecated
     public static boolean isBlank(String str){
         // 定义长度
         int length;
@@ -96,7 +80,7 @@ public class StringUtil{
 
         for (int i = 0; i < length; i++){
             // 如果有非空白字符则表示为非空字符串
-            if(CharUtil.isBlank(str.charAt(i))){
+            if(!CharUtil.isBlank(str.charAt(i))){
                 return false;
             }
         }
@@ -109,6 +93,7 @@ public class StringUtil{
      * @param object 对象
      * @return 是否为空白字符串
      */
+    @Deprecated
     public static boolean isBlank(Object object){
         if (object == null){
             return true;
@@ -125,6 +110,7 @@ public class StringUtil{
      * @param strs 字符串
      * @return 是否包含空白字符串
      */
+    @Deprecated
     public static boolean hasBlank(String... strs){
         // 判断数组元素是否为空,数组元素为空时 字符串为空
         if (ArrayUtil.isEmpty(strs)) {
@@ -144,6 +130,7 @@ public class StringUtil{
      * @param strs 字符串或字符串数组
      * @return 是否所有字符串都为空
      */
+    @Deprecated
     public static boolean isAllBlank(String... strs){
         // 判断数组元素是否为空,数组元素为空时 字符串为空白字符串
         if (ArrayUtil.isEmpty(strs)) {
@@ -165,61 +152,13 @@ public class StringUtil{
      * @param str 字符串
      * @return 是否为空字符串
      */
+    @Deprecated
     public static boolean isEmpty(String str) {
         return str == null || str.length() == 0;
     }
 
-    /**
-     * 判断字符串对象是否为空
-     * @param object 对象
-     * @return 是否为空字符串
-     */
-    public static boolean isEmpty(Object object){
-        if(object == null){
-            return true;
-        }else
-            // 判断对象是否为字符串
-            if(object instanceof String){
-                return 0 == ((String) object).length();
-        }
-        return false;
-    }
 
-    /**
-     * 判断字符串或字符串数组是否包含空字符串
-     * @param strs 对象
-     * @return 是否包含空字符串
-     */
-    public static boolean hasEmpty(String... strs){
-        if (ArrayUtil.isEmpty(strs)) {
-            return true;
-        }
 
-        for (String str : strs) {
-            if (isEmpty(str)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * 判断字符串或字符串数组是否全部为空字符串
-     * @param strs 字符串
-     * @return 是否全部为空字符串
-     */
-    public static boolean isAllEmpty(String... strs) {
-        if (ArrayUtil.isEmpty(strs)) {
-            return true;
-        }
-
-        for (String str : strs) {
-            if (!isEmpty(str)) {
-                return false;
-            }
-        }
-        return true;
-    }
 
     /**
      * 给定字符串是否被字符包围
