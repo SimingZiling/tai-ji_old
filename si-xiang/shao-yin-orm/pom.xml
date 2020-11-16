@@ -13,6 +13,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>shao-yin-orm-core</module>
+        <module>shao-yin-orm-for-tai-ji</module>
     </modules>
 
 
