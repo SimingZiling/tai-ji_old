@@ -26,7 +26,7 @@ public class IdCardVerify {
      */
     public static boolean isChineseIdCard(String idCard){
         // 首先判断传入身份证是否为空，如果为空则返回false
-        if(!StringUtil.isBlank(idCard)){
+        if(!StringVerify.isBlank(idCard)){
             return false;
         }
         // 判断身份证是否为旧身份证长度，如果是则通过旧身份证生成新身份证在进行验证

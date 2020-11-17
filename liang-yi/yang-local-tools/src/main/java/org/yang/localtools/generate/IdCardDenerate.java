@@ -2,6 +2,7 @@ package org.yang.localtools.generate;
 
 import org.yang.localtools.generate.exception.GenerateToolsException;
 import org.yang.localtools.util.StringUtil;
+import org.yang.localtools.verify.StringVerify;
 
 /**
  * 身份的生成
@@ -30,7 +31,7 @@ public class IdCardDenerate {
      */
     public static String generateNewIdCardByOldIdCard(String oldIdCard) throws GenerateToolsException {
         // 如果旧身份证为空，则返回空字符串
-        if(StringUtil.isBlank(oldIdCard) || oldIdCard.length() != OLD_ID_CARD_LENGTH){
+        if(StringVerify.isBlank(oldIdCard) || oldIdCard.length() != OLD_ID_CARD_LENGTH){
             throw new GenerateToolsException("旧身份证为空或位数不正确！");
         }
         // 设置字符串长度为新身份证长度

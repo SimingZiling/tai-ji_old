@@ -8,6 +8,11 @@ import java.lang.reflect.Array;
 public class StringVerify {
 
     /**
+     * 禁止生成StringVerify对象
+     */
+    protected StringVerify(){}
+
+    /**
      * 验证是否为空白字符串
      * 空白字符串定义：显示为空白的均为空白字符串，例如：空格、制表符、换行符等
      * @param str 字符串
@@ -148,7 +153,4 @@ public class StringVerify {
         return true;
     }
 
-    public static void main(String[] args) {
-        System.out.println(isAllBlank(" "," "));
-    }
 }

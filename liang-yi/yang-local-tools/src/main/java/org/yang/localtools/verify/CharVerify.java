@@ -5,6 +5,8 @@ package org.yang.localtools.verify;
  */
 public class CharVerify {
 
+    private CharVerify(){}
+
     /**
      * 判断是否为空白字符
      * @param c 字符

@@ -15,4 +15,16 @@ public class ArrayVerify {
         return array == null || array.length == 0;
     }
 
+    /**
+     * 验证对象是否为数组对象
+     * @param object 对象
+     * @return 是否为数组对象
+     */
+    public static boolean isArray(Object object) {
+        // 当对象为空时返回false
+        if (object == null) {
+            return false;
+        }
+        return object.getClass().isArray();
+    }
 }

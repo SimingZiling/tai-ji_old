@@ -7,6 +7,7 @@ import org.shaoyin.orm.exception.DoNotCreateException;
 import org.shaoyin.orm.jdbc.conversion.TypeConversion;
 import org.shaoyin.orm.util.ColumnInfo;
 import org.yang.localtools.exception.LocalToolsException;
+import org.yang.localtools.generate.StringDenerate;
 import org.yang.localtools.util.ClassUtil;
 import org.yang.localtools.util.StringUtil;
 
@@ -164,7 +165,7 @@ public class PackagSQL {
         // 当table注解的value属性为空时表名为首字母小写的类名
         if(table.value().equals("")){
             // 获取类名并去掉包名将首字母小写
-            return StringUtil.initialLowercase(entity.getName().substring(entity.getName().lastIndexOf(".") + 1));
+            return StringDenerate.initialLowercase(entity.getName().substring(entity.getName().lastIndexOf(".") + 1));
         }else {
             return table.value();
         }

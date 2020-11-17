@@ -1,6 +1,8 @@
 package org.yang.localtools.util;
 
 import org.yang.localtools.exception.LocalToolsException;
+import org.yang.localtools.generate.StringDenerate;
+import org.yang.localtools.verify.StringVerify;
 
 import javax.annotation.processing.Generated;
 import java.io.File;
@@ -383,11 +385,11 @@ public class ClassUtil {
      */
     public static Method getGetOrIsMethod(Class<?> clazz, String fieldName) throws LocalToolsException {
         try {
-            return clazz.getMethod("get"+StringUtil.initialCapital(fieldName));
+            return clazz.getMethod("get"+ StringDenerate.initialCapital(fieldName));
         } catch (NoSuchMethodException ignored) {
         }
         try {
-            return clazz.getMethod("is"+StringUtil.initialCapital(fieldName));
+            return clazz.getMethod("is"+StringDenerate.initialCapital(fieldName));
         } catch (NoSuchMethodException ignored) {
         }
         throw new LocalToolsException(clazz.getName()+"中没有"+fieldName+"的get或者is方法！");
@@ -438,7 +440,7 @@ public class ClassUtil {
                     field.set(object, (Character) value);
                 }
             } else if(fieldType.equals(Date.class)){
-                if(StringUtil.isBlank(datePattern)){
+                if(StringVerify.isBlank(datePattern)){
                     datePattern = "yyyy-MM-dd HH:mm:ss";
                 }
                 try {

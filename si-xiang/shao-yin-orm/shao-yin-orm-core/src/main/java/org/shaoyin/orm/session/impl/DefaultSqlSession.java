@@ -1,16 +1,17 @@
 package org.shaoyin.orm.session.impl;
 
+import com.mysql.cj.jdbc.result.ResultSetImpl;
 import org.shaoyin.orm.exception.DatabaseCoreException;
 import org.shaoyin.orm.exception.DoNotCreateException;
-import org.shaoyin.orm.jdbc.pool.ConnectionPool;
 import org.shaoyin.orm.orm.ObjectRelationMapping;
-import org.shaoyin.orm.session.Session;
+import org.shaoyin.orm.session.SqlSession;
 import org.shaoyin.orm.sql.PackagSQL;
 import org.shaoyin.orm.util.ColumnInfo;
 import org.yang.localtools.exception.LocalToolsException;
 import org.yang.localtools.util.ClassUtil;
 import org.yang.localtools.util.MapUtil;
 
+import javax.sql.DataSource;
 import java.beans.IntrospectionException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -20,28 +21,59 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Session实现类
+ * 默认的Sql会话
  */
-public class MySqlSessionImpl implements Session {
+public class DefaultSqlSession implements SqlSession {
 
-    protected Connection connection;
+    private Connection connection;
 
-    protected PreparedStatement preparedStatement = null;
+    private PreparedStatement preparedStatement = null;
 
-    protected ResultSet resultSet = null;
+    private ResultSet resultSet = null;
+
+    public DefaultSqlSession(DataSource dataSource) {
+        try {
+            // 获取连接
+            this.connection = dataSource.getConnection();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 执行查询SQL
+     * @param sql SQL语句
+     * @param paramList 参数列表
+     * @return 结果集
+     */
+    private ResultSet execQuerySQL(String sql, List<Object> paramList) throws SQLException {
+        return getPreparedStatement(sql,paramList).executeQuery();
+    }
+
+    /**
+     * 执行查询SQL
+     * @param sql SQL语句
+     * @return 结果集
+     */
+    private ResultSet execQuerySQL(String sql) throws SQLException {
+        return execQuerySQL(sql,null);
+    }
 
 
     @Override
-    public void close() throws SQLException {
-        // 验证Connection是否为空。如果不为空则调用链接池释放链接方法
-        if(connection != null){
-            if(preparedStatement != null){
-                if(resultSet != null){
-                    this.closeResultSet();
+    public void close() {
+        try {
+            if(connection != null){
+                if(preparedStatement != null){
+                    if(resultSet != null){
+                        resultSet.close();
+                    }
+                    preparedStatement.close();
                 }
-                this.closePreparedStatement();
+                connection.close();
             }
-            this.closeConnection();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
@@ -89,28 +121,8 @@ public class MySqlSessionImpl implements Session {
         execUpdateSQL(PackagSQL.deleteTable(clazz));
     }
 
-    /**
-     * 执行查询SQL
-     * @param sql SQL语句
-     * @param paramList 参数列表
-     * @return 结果集
-     */
-    private ResultSet execQuerySQL(String sql, List<Object> paramList) throws SQLException {
-        return getPreparedStatement(sql,paramList).executeQuery();
-    }
-
-    /**
-     * 执行查询SQL
-     * @param sql SQL语句
-     * @return 结果集
-     */
-    private ResultSet execQuerySQL(String sql) throws SQLException {
-        return execQuerySQL(sql,null);
-    }
-
     @Override
     public Object insert(String sql, List<Object> paramList, boolean isReturnPrimaryKey) throws SQLException, DatabaseCoreException {
-
         int execResult = execUpdateSQL(sql,paramList);
         if(execResult != 0){
             if(isReturnPrimaryKey){
@@ -207,8 +219,16 @@ public class MySqlSessionImpl implements Session {
     @Override
     public Map<String, Object> select(String sql) throws SQLException {
         resultSet =  execQuerySQL(sql);
-        resultSet.last();
-        if(resultSet.getRow() != 1){
+        // TODO 异常 Operation not allowed for a result set of type ResultSet.TYPE_FORWARD_ONLY.
+//        resultSet.last();
+
+//
+//        resultSet.first();
+        int count = 0;
+        while (resultSet.next()) {
+            count ++;
+        }
+        if(count != 1){
             throw new SQLException("期望获取结果为：1条数据，当前获取结果为："+resultSet.getRow()+"条数据！");
         }
         resultSet.first();
@@ -271,7 +291,7 @@ public class MySqlSessionImpl implements Session {
         // TODO 打印sql
         System.out.println(sql);
         // 获取声明，设置返回主键
-        preparedStatement = connection.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS);
+        preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
         // 如果参数不为空 则封装参数
         if(paramList != null && !paramList.isEmpty()) {
             for (int i = 0; i < paramList.size(); i++) {
@@ -304,9 +324,7 @@ public class MySqlSessionImpl implements Session {
      */
     private void closeConnection() throws SQLException {
         if(connection != null){
-            // 释放链接
-            ConnectionPool.releaseConnection(connection);
+            connection.close();
         }
     }
-
 }
