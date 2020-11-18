@@ -15,10 +15,9 @@ public class Demo {
                 "angel83528358");
         SqlSession sqlSession = sqlSessionFactory.openSqlSession();
         try {
-            System.out.println(sqlSession.selectList("SELECT * FROM `demo`.`example`"));
+            System.out.println(sqlSession.selectList("SELECT * FROM `demo`.`example`;"));
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
-
 }

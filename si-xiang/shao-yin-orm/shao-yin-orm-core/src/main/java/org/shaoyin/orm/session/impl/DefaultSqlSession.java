@@ -12,7 +12,6 @@ import org.yang.localtools.util.ClassUtil;
 import org.yang.localtools.util.MapUtil;
 
 import javax.sql.DataSource;
-import javax.sql.RowSet;
 import java.beans.IntrospectionException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -57,7 +56,7 @@ public class DefaultSqlSession implements SqlSession {
      * @return 结果集
      */
     private ResultSet execQuerySQL(String sql,boolean isASingle) throws SQLException {
-        return execQuerySQL(sql,null, connection.isClosed());
+        return execQuerySQL(sql,null, isASingle);
     }
 
 
@@ -204,7 +203,6 @@ public class DefaultSqlSession implements SqlSession {
     @Override
     public Map<String, Object> select(String sql, List<Object> paramList) throws SQLException {
         resultSet =  execQuerySQL(sql, paramList,true);
-        // TODO 异常 Operation not allowed for a result set of type ResultSet.TYPE_FORWARD_ONLY.
         resultSet.last();
         // 判断结果集是否大于1 如果是则抛出异常
         if(resultSet.getRow() > 1){
@@ -221,7 +219,6 @@ public class DefaultSqlSession implements SqlSession {
     @Override
     public Map<String, Object> select(String sql) throws SQLException {
         resultSet =  execQuerySQL(sql,true);
-//        // TODO 异常 Operation not allowed for a result set of type ResultSet.TYPE_FORWARD_ONLY.
         resultSet.last();
         // 判断结果集是否大于1 如果是则抛出异常
         if(resultSet.getRow() > 1){
