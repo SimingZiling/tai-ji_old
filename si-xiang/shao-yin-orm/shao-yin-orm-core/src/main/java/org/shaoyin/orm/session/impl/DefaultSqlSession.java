@@ -12,6 +12,7 @@ import org.yang.localtools.util.ClassUtil;
 import org.yang.localtools.util.MapUtil;
 
 import javax.sql.DataSource;
+import javax.sql.RowSet;
 import java.beans.IntrospectionException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -46,8 +47,8 @@ public class DefaultSqlSession implements SqlSession {
      * @param paramList 参数列表
      * @return 结果集
      */
-    private ResultSet execQuerySQL(String sql, List<Object> paramList) throws SQLException {
-        return getPreparedStatement(sql,paramList).executeQuery();
+    private ResultSet execQuerySQL(String sql, List<Object> paramList,boolean isASingle) throws SQLException {
+        return getPreparedStatement(sql,paramList,true,isASingle).executeQuery();
     }
 
     /**
@@ -55,8 +56,8 @@ public class DefaultSqlSession implements SqlSession {
      * @param sql SQL语句
      * @return 结果集
      */
-    private ResultSet execQuerySQL(String sql) throws SQLException {
-        return execQuerySQL(sql,null);
+    private ResultSet execQuerySQL(String sql,boolean isASingle) throws SQLException {
+        return execQuerySQL(sql,null, connection.isClosed());
     }
 
 
@@ -108,7 +109,7 @@ public class DefaultSqlSession implements SqlSession {
 
     @Override
     public int execUpdateSQL(String sql, List<Object> paramList) throws SQLException {
-        return getPreparedStatement(sql,paramList).executeUpdate();
+        return getPreparedStatement(sql,paramList,false,false).executeUpdate();
     }
 
     @Override
@@ -202,7 +203,8 @@ public class DefaultSqlSession implements SqlSession {
 
     @Override
     public Map<String, Object> select(String sql, List<Object> paramList) throws SQLException {
-        resultSet =  execQuerySQL(sql, paramList);
+        resultSet =  execQuerySQL(sql, paramList,true);
+        // TODO 异常 Operation not allowed for a result set of type ResultSet.TYPE_FORWARD_ONLY.
         resultSet.last();
         // 判断结果集是否大于1 如果是则抛出异常
         if(resultSet.getRow() > 1){
@@ -218,18 +220,16 @@ public class DefaultSqlSession implements SqlSession {
 
     @Override
     public Map<String, Object> select(String sql) throws SQLException {
-        resultSet =  execQuerySQL(sql);
-        // TODO 异常 Operation not allowed for a result set of type ResultSet.TYPE_FORWARD_ONLY.
-//        resultSet.last();
-
-//
-//        resultSet.first();
-        int count = 0;
-        while (resultSet.next()) {
-            count ++;
-        }
-        if(count != 1){
+        resultSet =  execQuerySQL(sql,true);
+//        // TODO 异常 Operation not allowed for a result set of type ResultSet.TYPE_FORWARD_ONLY.
+        resultSet.last();
+        // 判断结果集是否大于1 如果是则抛出异常
+        if(resultSet.getRow() > 1){
             throw new SQLException("期望获取结果为：1条数据，当前获取结果为："+resultSet.getRow()+"条数据！");
+        }
+        // 判断结果集是否等于0 如果是则返回空
+        if(resultSet.getRow() == 0){
+            return null;
         }
         resultSet.first();
         return ObjectRelationMapping.handleResultSetToMap(resultSet);
@@ -237,13 +237,13 @@ public class DefaultSqlSession implements SqlSession {
 
     @Override
     public List<Map<String, Object>> selectList(String sql, List<Object> paramList) throws SQLException {
-        resultSet = execQuerySQL(sql, paramList);
+        resultSet = execQuerySQL(sql, paramList,false);
         return ObjectRelationMapping.handleResultSetToMapList(resultSet);
     }
 
     @Override
     public List<Map<String, Object>> selectList(String sql) throws SQLException {
-        resultSet = execQuerySQL(sql);
+        resultSet = execQuerySQL(sql,false);
         return ObjectRelationMapping.handleResultSetToMapList(resultSet);
     }
 
@@ -285,13 +285,20 @@ public class DefaultSqlSession implements SqlSession {
      * 获取声明
      * @param sql sql语句
      * @param paramList 参数列表
+     * @param isQuery 是否是查询
+     * @param isASingle 是否为单条
      * @return 参数
      */
-    private PreparedStatement getPreparedStatement(String sql, List<Object> paramList) throws SQLException {
+    private PreparedStatement getPreparedStatement(String sql, List<Object> paramList,boolean isQuery,boolean isASingle) throws SQLException {
         // TODO 打印sql
         System.out.println(sql);
         // 获取声明，设置返回主键
-        preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+        if(isQuery){
+            preparedStatement = connection.prepareStatement(sql,
+                    isASingle?ResultSet.TYPE_SCROLL_INSENSITIVE:ResultSet.TYPE_SCROLL_SENSITIVE,ResultSet.CONCUR_READ_ONLY);
+        }else {
+            preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+        }
         // 如果参数不为空 则封装参数
         if(paramList != null && !paramList.isEmpty()) {
             for (int i = 0; i < paramList.size(); i++) {
