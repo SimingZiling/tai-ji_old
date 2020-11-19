@@ -1,11 +1,11 @@
 package org.shaoyin.orm.session.impl;
 
 import org.shaoyin.orm.config.Configuration;
+
 import org.shaoyin.orm.exception.DatabaseConfigException;
 import org.shaoyin.orm.pool.DefaultDataSource;
 import org.shaoyin.orm.session.SqlSession;
 import org.shaoyin.orm.session.SqlSessionFactory;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,52 +18,42 @@ import java.util.Objects;
 import java.util.Properties;
 
 /**
- * 默认会话Sql会话工厂
- * 负责加载配置文件，生产产生会话
+ * 默认Sql会话工厂
  */
 public class DefaultSqlSessionFactory implements SqlSessionFactory {
 
     Logger logger = LoggerFactory.getLogger(this.getClass());
 
+    /** 配置信息对象 */
     private final Configuration configuration = new Configuration();
 
-    public DefaultSqlSessionFactory() throws DatabaseConfigException {
+    /**
+     * 读取properties文件的配置信息
+     */
+    Properties properties = new Properties();
+
+    /**
+     * 构造会话工厂，默认读取配置文件并且生成配置
+     */
+    public DefaultSqlSessionFactory() {
+        logger.info("开始加载配置文件并构建配置信息");
         // 加载配置文件
-        logger.info("开始加载数据库配置文件");
         try(InputStream inputStream = new FileInputStream(Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource("")).getPath()+"database.properties")) {
-            //创建Properties对象用于读取**.properties文件
-            Properties properties = new Properties();
+            // 读取配置信息
             properties.load(inputStream);
-            // 构建配置信息
+            // 开始构建配置信息
             configuration.setConfiguration(new Configuration.Builder()
-                    .addDriverClass(String.valueOf(properties.get("driverClass")))
-                    .addPassword(String.valueOf(properties.get("password")))
-                    .addUrl(String.valueOf(properties.get("url")))
-                    .addUser(String.valueOf(properties.get("user")))
-                    .build()
-            );
+                    .addUser(properties.getProperty("user"))
+                    .addUrl(properties.getProperty("url"))
+                    .addPassword(properties.getProperty("password"))
+                    .addDriverClass(properties.getProperty("driverClass"))
+                    .build());
         } catch (FileNotFoundException e) {
             logger.error("database文件不存在");
         } catch (IOException e) {
             e.printStackTrace();
-        }
-    }
-
-    public DefaultSqlSessionFactory(Configuration configuration){
-        configuration.setConfiguration(configuration);
-    }
-
-    public DefaultSqlSessionFactory(String driverClass,String url,String user,String password){
-        // 构建配置信息
-        try {
-            configuration.setConfiguration(new Configuration.Builder()
-                    .addDriverClass(String.valueOf(driverClass))
-                    .addPassword(String.valueOf(password))
-                    .addUrl(String.valueOf(url))
-                    .addUser(String.valueOf(user))
-                    .build());
         } catch (DatabaseConfigException e) {
-            e.printStackTrace();
+            logger.error(e.getLocalizedMessage());
         }
     }
 

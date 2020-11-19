@@ -5,7 +5,6 @@ import org.shaoyin.orm.config.Configuration;
 import javax.sql.DataSource;
 import java.io.PrintWriter;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
 import java.util.logging.Logger;
@@ -15,13 +14,14 @@ import java.util.logging.Logger;
  */
 public class DefaultDataSource implements DataSource {
 
+    /** 配置信息 */
     private final Configuration configuration;
 
     /**
-     * 构造方法获设置配置
-     * @param configuration 配置信息
+     * 默认数据源构造方法，加载数据库驱动
+     * @param configuration 数据源配置
      */
-    public DefaultDataSource(Configuration configuration){
+    public DefaultDataSource(Configuration configuration) {
         this.configuration = configuration;
         try {
             Class.forName(configuration.getDriverClass());
@@ -32,49 +32,46 @@ public class DefaultDataSource implements DataSource {
 
     @Override
     public Connection getConnection() throws SQLException {
-        // 从数据库直接获取
-        return DriverManager.getConnection(configuration.getUrl(),
-                configuration.getUser(),
-                configuration.getPassword());
+        return null;
     }
 
     @Override
     public Connection getConnection(String username, String password) throws SQLException {
-        return DriverManager.getConnection(configuration.getUrl(),username,password);
+        return null;
     }
 
     @Override
     public PrintWriter getLogWriter() throws SQLException {
-        return DriverManager.getLogWriter();
+        return null;
     }
 
     @Override
     public void setLogWriter(PrintWriter out) throws SQLException {
-        DriverManager.setLogWriter(out);
+
     }
 
     @Override
     public void setLoginTimeout(int seconds) throws SQLException {
-        DriverManager.setLoginTimeout(seconds);
+
     }
 
     @Override
     public int getLoginTimeout() throws SQLException {
-        return DriverManager.getLoginTimeout();
+        return 0;
     }
 
     @Override
     public Logger getParentLogger() throws SQLFeatureNotSupportedException {
-        throw new SQLFeatureNotSupportedException("数据源不支持getParentLogger方法！");
+        return null;
     }
 
     @Override
     public <T> T unwrap(Class<T> iface) throws SQLException {
-        throw new SQLException("不支持unwrap方法！");
+        return null;
     }
 
     @Override
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
-        throw new SQLException("不支持isWrapperFor方法！");
+        return false;
     }
 }

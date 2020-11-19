@@ -4,10 +4,9 @@ import org.shaoyin.orm.exception.DatabaseConfigException;
 import org.yang.localtools.verify.StringVerify;
 
 /**
- * 配置类
+ * 数据库配置信息
  */
 public class Configuration {
-
 
     public Configuration() {}
 
@@ -18,11 +17,12 @@ public class Configuration {
         this.password = configuration.password;
     }
 
-    public void setConfiguration(Configuration configuration){
+    public Configuration setConfiguration(Configuration configuration){
         this.user = configuration.user;
         this.url = configuration.url;
         this.driverClass = configuration.driverClass;
         this.password = configuration.password;
+        return this;
     }
 
     /**数据库地址*/
@@ -51,36 +51,40 @@ public class Configuration {
     }
 
     /**
-     * 构建
+     * 内部构造者类（使用构造者模式进行数据库构造）
      */
     public static class Builder{
 
-        private Configuration configuration;
+        private final Configuration configuration;
 
         public Builder() {
-            this.configuration = new Configuration();
+            configuration = new Configuration();
         }
 
         public Builder addUser(String user){
-            this.configuration.user = user;
+            configuration.user = user;
             return this;
         }
 
         public Builder addUrl(String url){
-            this.configuration.url = url;
+            configuration.url = url;
             return this;
         }
 
         public Builder addPassword(String password){
-            this.configuration.password = password;
+            configuration.password = password;
             return this;
         }
 
         public Builder addDriverClass(String driverClass){
-            this.configuration.driverClass = driverClass;
+            configuration.driverClass = driverClass;
             return this;
         }
 
+        /**
+         * 手动构建配置信息
+         * @return 配置信息
+         */
         public Configuration build() throws DatabaseConfigException {
             verifyConfiguration(configuration.user,"数据库用户名不存在！");
             verifyConfiguration(configuration.driverClass,"数据库驱动不存在！");
