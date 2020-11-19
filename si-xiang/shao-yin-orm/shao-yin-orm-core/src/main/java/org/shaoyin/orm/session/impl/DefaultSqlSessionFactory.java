@@ -59,7 +59,8 @@ public class DefaultSqlSessionFactory implements SqlSessionFactory {
 
     @Override
     public SqlSession openSqlSession() {
-        DataSource dataSource = new DefaultDataSource(configuration);
+        // 禁止通过其他方法修改对当前数据源
+        final DataSource dataSource = new DefaultDataSource(configuration);
         return new DefaultSqlSession(dataSource);
     }
 }
