@@ -61,6 +61,7 @@ public class DefaultSqlSessionFactory implements SqlSessionFactory {
     public SqlSession openSqlSession() {
         // 禁止通过其他方法修改对当前数据源
         final DataSource dataSource = new DefaultDataSource(configuration);
-        return new DefaultSqlSession(dataSource);
+//        return new DefaultSqlSession(dataSource);
+        return null;
     }
 }
